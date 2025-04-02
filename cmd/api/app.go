@@ -30,14 +30,14 @@ func NewApp() *App {
 	app.storage = app.setupDatabase()
 	app.handlers = handler.NewHandlers(app.storage)
 
-	app.setupMiddlewares()
+	app.setupGlobalMiddlewares()
 	app.setupRoutes()
 
 	return app
 }
 
 // Registers middlewares
-func (a *App) setupMiddlewares() {
+func (a *App) setupGlobalMiddlewares() {
 	a.router.Use(Middleware{name: "LogMiddleware", execution: loggingMiddleware})
 	a.router.Use(Middleware{name: "JsonMiddleware", execution: jsonMiddleware})
 }
@@ -46,8 +46,11 @@ func (a *App) setupMiddlewares() {
 func (a *App) setupRoutes() {
 	api := a.router.Group("/v1/api")
 	api.Get("/health", a.healthCheckHandler)
-	api.Post("/users", a.handlers.User.CreateUser)
-	api.Get("/users/{id}", a.handlers.User.GetUserById)
+
+	// dumb fuck shit. needs a better way to deal with groups and subgroups
+	users := api.SubGroup("/users")
+	users.Post("/", a.handlers.User.CreateUser)
+	users.Get("/{id}", a.handlers.User.GetUserById)
 }
 
 // Initializes and connects to the database
