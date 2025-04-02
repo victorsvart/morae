@@ -27,7 +27,7 @@ type UserStore struct {
 }
 
 func (us *UserStore) GetById(ctx context.Context, id uint64) (*UserEntity, error) {
-	query := "SELECT id, fullName, emailAddress, FROM mre_users where id = $1"
+	query := "SELECT id, full_name, email_address FROM mre_users where id = $1"
 	var user UserEntity
 	err := us.db.QueryRowContext(ctx, query, id).Scan(&user.ID, &user.FullName, &user.EmailAddress)
 	if err != nil {

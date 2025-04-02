@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"golangproj/internal/db"
 	"golangproj/internal/handler"
@@ -14,10 +13,12 @@ import (
 type App struct {
 	router   *Router
 	config   *Config
+	storage  *postgres.PostgresStorage
 	handlers *handler.Handlers
 }
 
-func mount() (*http.Server, *Config) {
+// Initializes and returns a new App instance
+func NewApp() *App {
 	cfg := newConfig()
 	r := newRouter()
 
@@ -26,37 +27,30 @@ func mount() (*http.Server, *Config) {
 		config: cfg,
 	}
 
-	storage := app.setupDatabase()
-	app.handlers = app.setupHandlers(storage)
+	app.storage = app.setupDatabase()
+	app.handlers = handler.NewHandlers(app.storage)
 
-	r.Use(Middleware{name: "LogMiddleware", execution: loggingMiddleware})
-	r.Use(Middleware{name: "JsonMiddleware", execution: jsonMiddleware})
+	app.setupMiddlewares()
+	app.setupRoutes()
 
-	api := r.Group("/v1/api")
-	api.Get("/health", app.healthCheckHandler)
-	api.Get("/users", app.handlers.User.CreateUser)
-
-	svr := &http.Server{
-		Addr:         app.config.port,
-		Handler:      app.router,
-		WriteTimeout: time.Second * 30,
-		ReadTimeout:  time.Second * 10,
-		IdleTimeout:  time.Minute,
-	}
-
-	return svr, cfg
+	return app
 }
 
-func setupStorage(db *sql.DB) *postgres.PostgresStorage {
-	postgresCon := postgres.NewPostgresStorage(db)
-	return postgresCon
+// Registers middlewares
+func (a *App) setupMiddlewares() {
+	a.router.Use(Middleware{name: "LogMiddleware", execution: loggingMiddleware})
+	a.router.Use(Middleware{name: "JsonMiddleware", execution: jsonMiddleware})
 }
 
-func (a *App) setupHandlers(storage *postgres.PostgresStorage) *handler.Handlers {
-	handlers := handler.NewHandlers(storage)
-	return handlers
+// Registers API routes
+func (a *App) setupRoutes() {
+	api := a.router.Group("/v1/api")
+	api.Get("/health", a.healthCheckHandler)
+	api.Post("/users", a.handlers.User.CreateUser)
+	api.Get("/users/{id}", a.handlers.User.GetUserById)
 }
 
+// Initializes and connects to the database
 func (a *App) setupDatabase() *postgres.PostgresStorage {
 	db, err := db.New(
 		a.config.dsn,
@@ -66,15 +60,33 @@ func (a *App) setupDatabase() *postgres.PostgresStorage {
 	)
 
 	if err != nil {
-		log.Panic("Error connecting to database!")
+		log.Fatalf("Error connecting to database: %v", err)
 	}
 
 	log.Println("Connected to database!")
-	return setupStorage(db)
+	return postgres.NewPostgresStorage(db)
 }
 
+// Handles API health checks
 func (a *App) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	response := map[string]string{"status": "ok", "message": "API is up and running"}
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(map[string]string{
+		"status":  "ok",
+		"message": "API is up and running",
+	})
+}
+
+// Initializes the server
+func mount() (*http.Server, *Config) {
+	app := NewApp()
+
+	svr := &http.Server{
+		Addr:         app.config.port,
+		Handler:      app.router,
+		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  10 * time.Second,
+		IdleTimeout:  time.Minute,
+	}
+
+	return svr, app.config
 }
