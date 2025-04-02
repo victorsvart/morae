@@ -60,12 +60,12 @@ direnv allow
 1. Create a PostgreSQL database:
 
    ```
-   createdb databasename
+   $ createdb databasename
    ```
 
 2. Run migrations:
    ```
-   make migrate-up
+   $ make migrate-up
    ```
 
 ## Running the Application
