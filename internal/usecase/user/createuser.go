@@ -1,0 +1,41 @@
+package user
+
+import (
+	"context"
+	"errors"
+	"golangproj/internal/domain/userdomain"
+	"golangproj/internal/mapper/usermapper"
+	"golangproj/internal/store/postgres"
+)
+
+type CreateUserUsecase interface {
+	Execute(context.Context, *userdomain.UserInput) (*userdomain.UserResponse, error)
+}
+
+type Create struct {
+	repo postgres.UserRepository
+}
+
+func (c *Create) Execute(ctx context.Context, input *userdomain.UserInput) (*userdomain.UserResponse, error) {
+	if input == nil {
+		return nil, ErrInputIsNil
+	}
+
+	domain, err := usermapper.FromInput(input)
+	if err != nil {
+		return nil, err
+	}
+
+	domain.UserChecksAndSets(input.EmailAddress, input.Password)
+
+	entity := usermapper.ToEntity(domain)
+	if err := c.repo.Create(ctx, entity); err != nil {
+		return nil, err
+	}
+
+	return usermapper.ToResponse(entity), nil
+}
+
+var (
+	ErrInputIsNil = errors.New("Input is null.")
+)

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"golangproj/internal/db"
+	"golangproj/internal/handler"
 	"golangproj/internal/store/postgres"
 	"log"
 	"net/http"
@@ -11,9 +12,9 @@ import (
 )
 
 type App struct {
-	router *Router
-	config *Config
-	store  *postgres.PostgresStorage
+	router   *Router
+	config   *Config
+	handlers *handler.Handlers
 }
 
 func mount() (*http.Server, *Config) {
@@ -24,13 +25,16 @@ func mount() (*http.Server, *Config) {
 		router: r,
 		config: cfg,
 	}
-	app.store = app.setupDatabase()
+
+	storage := app.setupDatabase()
+	app.handlers = app.setupHandlers(storage)
 
 	r.Use(Middleware{name: "LogMiddleware", execution: loggingMiddleware})
 	r.Use(Middleware{name: "JsonMiddleware", execution: jsonMiddleware})
 
 	api := r.Group("/v1/api")
 	api.Get("/health", app.healthCheckHandler)
+	api.Get("/users", app.handlers.User.CreateUser)
 
 	svr := &http.Server{
 		Addr:         app.config.port,
@@ -46,7 +50,11 @@ func mount() (*http.Server, *Config) {
 func setupStorage(db *sql.DB) *postgres.PostgresStorage {
 	postgresCon := postgres.NewPostgresStorage(db)
 	return postgresCon
+}
 
+func (a *App) setupHandlers(storage *postgres.PostgresStorage) *handler.Handlers {
+	handlers := handler.NewHandlers(storage)
+	return handlers
 }
 
 func (a *App) setupDatabase() *postgres.PostgresStorage {
