@@ -73,26 +73,26 @@ direnv allow
 ### Development Mode with Hot Reloading
 
 ```
-air
+$ air
 ```
 
 ### Standard Development Mode
 
 ```
-make run
+$ make run
 ```
 
 ### Build and Run
 
 ```
-make build
-./morae
+$ make build
+$ ./morae
 ```
 
 ### Testing
 
 ```
-make test
+$ make test
 ```
 
 ## Makefile Commands
