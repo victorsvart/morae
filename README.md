@@ -25,9 +25,10 @@ Morae is a Golang REST API with minimum usage of external libraries.
 
    ```
    go mod download
+   go mod tidy
    ```
 
-3. Install Air for hot reloading (if not already installed):
+3. Install Air for hot reloading (if not already installed). This is not necessary, check Make scripts bellow to run without hot reloading:
    ```
    go install github.com/cosmtrek/air@latest
    ```
