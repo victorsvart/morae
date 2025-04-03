@@ -18,8 +18,8 @@ type Route struct {
 // such as "NotFound and NotAllowed statuses
 type Router struct {
 	*http.ServeMux
+	RouteHandler
 	routes     map[string][]*Route
-	middleware []Middleware
 	notFound   http.HandlerFunc
 	notAllowed http.HandlerFunc
 	mu         sync.RWMutex
@@ -42,12 +42,15 @@ func NewMiddleware(name string, f MiddlewareFunc) *Middleware {
 
 // Creates a new Router instance with default configurations
 func newRouter() *Router {
-	return &Router{
+	router := &Router{
 		ServeMux:   http.NewServeMux(),
 		routes:     make(map[string][]*Route),
 		notFound:   http.NotFoundHandler().ServeHTTP,
 		notAllowed: NotAllowedHandler().ServeHTTP,
 	}
+	router.RouteHandler = RouteHandler{router: router, prefix: ""}
+
+	return router
 }
 
 // Default handler for method-not-allowed cases
@@ -90,17 +93,10 @@ func (r *Router) Handle(method, pattern string, handler http.HandlerFunc) {
 	r.ServeMux.Handle(fullPattern, route.handlerFunc)
 }
 
-// Registers middleware functions to be applied to all routes
-func (r *Router) Use(mid Middleware) {
-	r.middleware = append(r.middleware, mid)
-	log.Printf("Registered global middlewares: %v", mid.name)
-}
-
 // Creates a new route group with a common prefix | Ex. /v1/api is a group. /v1/api/users is a subgroup
 func (r *Router) Group(prefix string) *Group {
 	group := &Group{
-		router: r,
-		prefix: prefix,
+		RouteHandler: RouteHandler{router: r, prefix: prefix},
 	}
 
 	log.Printf("Registered group: %s", prefix)
