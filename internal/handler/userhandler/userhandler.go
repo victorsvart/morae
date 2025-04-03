@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"golangproj/internal/domain/userdomain"
+	"golangproj/internal/mapper/usermapper"
 	"golangproj/internal/usecase/user"
 	"golangproj/internal/utils"
 	"net/http"
@@ -12,6 +13,28 @@ import (
 
 type UserHandler struct {
 	Usecases *user.UserUsecases
+}
+
+func (u *UserHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("Error getting id. Check if its not null or empty"))
+		return
+	}
+
+	response, err := u.Usecases.GetById.Execute(r.Context(), id)
+	if response == nil {
+		utils.RespondWithError(w, http.StatusNotFound, err)
+		return
+	}
+
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, response)
 }
 
 func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -36,19 +59,48 @@ func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusCreated, response)
 }
 
-func (u *UserHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
+func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	var userDto userdomain.UserDto
+
+	if err := json.NewDecoder(r.Body).Decode(&userDto); err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	domain, err := usermapper.FromDto(&userDto)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	if domain.Password.Value != "" && domain.Password.HashPassword() != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response, err := u.Usecases.Update.Execute(r.Context(), domain)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, response)
+}
+
+func (u *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, errors.New("Error getting id. Check if its not null or empty"))
+		utils.RespondWithError(w, http.StatusBadRequest, errors.New("invalid user ID"))
 		return
 	}
 
-	response, err := u.Usecases.GetById.Execute(r.Context(), id)
+	err = u.Usecases.Delete.Execute(r.Context(), id)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
-	utils.RespondWithJSON(w, http.StatusOK, response)
+	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "User deleted successfully"})
 }

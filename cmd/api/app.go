@@ -51,8 +51,10 @@ func (a *App) setupRoutes() {
 
 	// dumb fuck shit. needs a better way to deal with groups and subgroups
 	users := api.SubGroup("/users")
-	users.Post("/", a.handlers.User.CreateUser)
 	users.Get("/{id}", a.handlers.User.GetUserById)
+	users.Post("/", a.handlers.User.CreateUser)
+	users.Put("/", a.handlers.User.UpdateUser)
+	users.Delete("/{id}", a.handlers.User.DeleteUser)
 }
 
 // Initializes and connects to the database

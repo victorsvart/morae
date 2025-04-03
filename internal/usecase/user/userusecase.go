@@ -5,13 +5,17 @@ import (
 )
 
 type UserUsecases struct {
-	Create  CreateUserUsecase
 	GetById GetUserByIdUsecase
+	Create  CreateUserUsecase
+	Update  UpdateUserUsecase
+	Delete  DeleteUserUsecase
 }
 
 func NewUserUsecases(repo postgres.UserRepository) *UserUsecases {
 	return &UserUsecases{
-		Create:  &Create{repo},
 		GetById: &GetUserById{repo},
+		Create:  &Create{repo},
+		Update:  &Update{repo},
+		Delete:  &Delete{repo},
 	}
 }

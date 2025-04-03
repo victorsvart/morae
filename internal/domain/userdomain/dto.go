@@ -1,7 +1,6 @@
 package userdomain
 
 import (
-	"errors"
 	"time"
 )
 
@@ -20,14 +19,14 @@ type UserInput struct {
 
 func (ui *UserInput) Validate() error {
 	if ui.FullName == "" {
-		return errors.New("full name is required")
+		return ErrFullNameIsRequired
 	}
 
 	if ui.EmailAddress == "" {
-		return errors.New("email address is required")
+		return ErrEmailIsRequired
 	}
 	if ui.Password == "" {
-		return errors.New("password is required")
+		return ErrPasswordIsRequired
 	}
 
 	return nil
