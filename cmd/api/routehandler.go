@@ -18,6 +18,10 @@ func (rh *RouteHandler) Handle(method, pattern string, handler http.HandlerFunc)
 	}
 
 	fullPattern += pattern
+	for i := range rh.middleware {
+		handler = rh.middleware[i].exec(handler)
+	}
+
 	rh.router.Handle(method, fullPattern, handler)
 }
 

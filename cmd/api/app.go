@@ -39,8 +39,8 @@ func NewApp() *App {
 // Registers middlewares
 func (a *App) setupGlobalMiddlewares() {
 	a.router.Use(
-		Middleware{name: "LogMiddleware", execution: loggingMiddleware},
-		Middleware{name: "JsonMiddleware", execution: jsonMiddleware},
+		Middleware{name: "LogMiddleware", exec: loggingMiddleware},
+		Middleware{name: "JsonMiddleware", exec: jsonMiddleware},
 	)
 }
 

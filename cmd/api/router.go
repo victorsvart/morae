@@ -26,8 +26,8 @@ type Router struct {
 }
 
 type Middleware struct {
-	name      string
-	execution MiddlewareFunc
+	name string
+	exec MiddlewareFunc
 }
 
 // Base type for middleware application
@@ -35,8 +35,8 @@ type MiddlewareFunc func(http.HandlerFunc) http.HandlerFunc
 
 func NewMiddleware(name string, f MiddlewareFunc) *Middleware {
 	return &Middleware{
-		name:      name,
-		execution: f,
+		name: name,
+		exec: f,
 	}
 }
 
@@ -73,7 +73,7 @@ func NotAllowedHandler() http.Handler {
 // Registers a new route  for a specific HTTP method and pattern
 func (r *Router) Handle(method, pattern string, handler http.HandlerFunc) {
 	for _, mw := range r.middleware {
-		handler = mw.execution(handler)
+		handler = mw.exec(handler)
 	}
 
 	route := &Route{
@@ -101,29 +101,4 @@ func (r *Router) Group(prefix string) *Group {
 
 	log.Printf("Registered group: %s", prefix)
 	return group
-}
-
-// Registers a handler for HTTP GET requests
-func (r *Router) Get(pattern string, handler http.HandlerFunc) {
-	r.Handle(http.MethodGet, pattern, handler)
-}
-
-// Registers a handler for HTTP POST requests
-func (r *Router) Post(pattern string, handler http.HandlerFunc) {
-	r.Handle(http.MethodPost, pattern, handler)
-}
-
-// Registers a handler for HTTP PUT requests
-func (r *Router) Put(pattern string, handler http.HandlerFunc) {
-	r.Handle(http.MethodPut, pattern, handler)
-}
-
-// Registers a handler for HTTP DELETE requests
-func (r *Router) Delete(pattern string, handler http.HandlerFunc) {
-	r.Handle(http.MethodDelete, pattern, handler)
-}
-
-// Implements ServeMux ServeHTTP function. Processes HTTP requests using registerd routes
-func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	r.ServeMux.ServeHTTP(w, req)
 }
