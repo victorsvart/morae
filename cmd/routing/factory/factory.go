@@ -1,6 +1,8 @@
 package factory
 
 import (
+	"morae/cmd/routing/factory/authroute"
+	"morae/cmd/routing/factory/userroute"
 	"morae/cmd/routing/healthcheck"
 	"morae/cmd/routing/middleware"
 	"morae/cmd/routing/router"
@@ -35,19 +37,12 @@ func (a *RouteFactory) setupRoutes() {
 	api := a.Router.Group("/v1/api")
 	api.Get("/healthcheck", healthcheck.HealthCheckHandler)
 
-	// dumb shit. needs a better way to deal with  subgroups in the router
-	auth := api.SubGroup("/auth")
-	auth.Post("/login", a.handlers.Auth.Login)
-	auth.Post("/register", a.handlers.Auth.Register)
-	auth.Post("/logout", a.handlers.Auth.Logout)
+	routeGroups := []RouteGroup {
+		&authroute.AuthRoutes{Handlers: &a.handlers.Auth},
+    &userroute.UserRoutes{Handlers: &a.handlers.User},
+	}
 
-	users := api.SubGroup(
-		"/users",
-    router.NewMiddleware("AuthMiddleware", middleware.AuthMiddleware),
-	)
-
-	users.Get("/{id}", a.handlers.User.GetUserById)
-	users.Post("/", a.handlers.User.CreateUser)
-	users.Put("/", a.handlers.User.UpdateUser)
-	users.Delete("/{id}", a.handlers.User.DeleteUser)
+	for _, rg := range routeGroups {
+		rg.Register(api)
+	}
 }
