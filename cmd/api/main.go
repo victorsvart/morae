@@ -18,7 +18,8 @@ func main() {
 			log.Fatalf("Server close error: %v", err)
 		}
 	}()
-	log.Printf("Server started at: %s%s", cfg.host, app.Addr)
+
+	log.Printf("Server started at: %s%s", cfg.Host, app.Addr)
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)

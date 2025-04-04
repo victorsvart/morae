@@ -1,4 +1,4 @@
-package main
+package router
 
 import (
 	"encoding/json"
@@ -26,8 +26,8 @@ type Router struct {
 }
 
 type Middleware struct {
-	name string
-	exec MiddlewareFunc
+	Name string
+	Exec MiddlewareFunc
 }
 
 // Base type for middleware application
@@ -35,13 +35,13 @@ type MiddlewareFunc func(http.HandlerFunc) http.HandlerFunc
 
 func NewMiddleware(name string, f MiddlewareFunc) *Middleware {
 	return &Middleware{
-		name: name,
-		exec: f,
+		Name: name,
+		Exec: f,
 	}
 }
 
 // Creates a new Router instance with default configurations
-func newRouter() *Router {
+func NewRouter() *Router {
 	router := &Router{
 		ServeMux:   http.NewServeMux(),
 		routes:     make(map[string][]*Route),
@@ -73,7 +73,7 @@ func NotAllowedHandler() http.Handler {
 // Registers a new route  for a specific HTTP method and pattern
 func (r *Router) Handle(method, pattern string, handler http.HandlerFunc) {
 	for _, mw := range r.middleware {
-		handler = mw.exec(handler)
+		handler = mw.Exec(handler)
 	}
 
 	route := &Route{

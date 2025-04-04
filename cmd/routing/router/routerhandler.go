@@ -1,4 +1,4 @@
-package main
+package router
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ func (rh *RouteHandler) Handle(method, pattern string, handler http.HandlerFunc)
 
 	fullPattern += pattern
 	for i := range rh.middleware {
-		handler = rh.middleware[i].exec(handler)
+		handler = rh.middleware[i].Exec(handler)
 	}
 
 	rh.router.Handle(method, fullPattern, handler)
@@ -36,7 +36,7 @@ func (rh *RouteHandler) Use(mid ...Middleware) {
 	}
 
 	for _, m := range mid {
-		log.Printf("Applied middleware %q to %s", m.name, scope)
+		log.Printf("Applied middleware %q to %s", m.Name, scope)
 	}
 }
 
