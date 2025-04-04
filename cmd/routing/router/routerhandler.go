@@ -1,4 +1,4 @@
-package main
+package router
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 
 type RouteHandler struct {
 	router     *Router
-	middleware []Middleware
+	middleware []*Middleware
 	prefix     string
 }
 
@@ -21,22 +21,24 @@ func (rh *RouteHandler) Handle(method, pattern string, handler http.HandlerFunc)
 
 	fullPattern += pattern
 	for i := range rh.middleware {
-		handler = rh.middleware[i].exec(handler)
+		handler = rh.middleware[i].Exec(handler)
 	}
 
 	rh.router.Handle(method, fullPattern, handler)
 }
 
-func (rh *RouteHandler) Use(mid ...Middleware) {
-	rh.middleware = append(rh.middleware, mid...)
-
-	scope := "global"
-	if rh.prefix != "" {
-		scope = fmt.Sprintf("route %q", rh.prefix)
-	}
-
+func (rh *RouteHandler) Use(mid ...*Middleware) {
 	for _, m := range mid {
-		log.Printf("Applied middleware %q to %s", m.name, scope)
+		if m == nil {
+			continue
+		}
+
+		rh.middleware = append(rh.middleware, m)
+		scope := "global"
+		if rh.prefix != "" {
+			scope = fmt.Sprintf("route %q", rh.prefix)
+		}
+		log.Printf("Applied middleware %q to %s", m.Name, scope)
 	}
 }
 

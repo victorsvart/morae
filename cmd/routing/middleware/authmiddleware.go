@@ -1,7 +1,8 @@
-package main
+package middleware
 
 import (
 	"fmt"
+	"morae/cmd/config"
 	"net/http"
 	"os"
 
@@ -25,9 +26,9 @@ func verifyJWT(tokenString string) error {
 	return err
 }
 
-func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie(getEnv("AUTH_TOKEN_NAME", "dev_token"))
+		cookie, err := r.Cookie(config.GetEnv("AUTH_TOKEN_NAME", "dev_token"))
 		if err != nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return

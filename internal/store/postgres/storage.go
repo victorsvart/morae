@@ -7,7 +7,7 @@ import (
 	"github.com/Masterminds/squirrel"
 )
 
-// postgres specific stuff. Sets all '?' parameters as $.
+// postgres specific stuff. Sets all '?' query parameters as $.
 var qb = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
 type PostgresStorage struct {
