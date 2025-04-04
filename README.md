@@ -47,7 +47,10 @@ export HOST=localhost
 export DSN=postgres://youruser:yourpasword@localhost/databasename
 export DB_MAX_OPEN_CONNS=30
 export DB_MAX_IDLE_CONNS=30
-export DB_MAX_IDLE_TIME=15min
+export DB_MAX_IDLE_TIME=900s
+export SECRET_KEY=yousecretkey
+export SECURE_TOKEN=false
+export AUTH_TOKEN_NAME=dev_token
 ```
 
 Install direnv on your Linux distribution:
