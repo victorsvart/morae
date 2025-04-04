@@ -9,6 +9,7 @@ import (
 	"morae/internal/usecase/auth"
 	"morae/internal/utils"
 	"net/http"
+	"time"
 )
 
 type AuthHandler struct {
@@ -61,4 +62,19 @@ func (a *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.RespondWithSuccess(w, http.StatusCreated, "Registered successfully")
+}
+
+func (a *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     env.GetString("AUTH_TOKEN_NAME", "dev_token"),
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1, // tells browser to delete the cookie
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+		Secure:   env.GetBool("SECURE_TOKEN", false), // Must match
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	utils.RespondWithSuccess(w, http.StatusOK, "Logged out successfully")
 }

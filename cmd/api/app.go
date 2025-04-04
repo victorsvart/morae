@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"morae/internal/db"
 	"morae/internal/handler"
 	"morae/internal/store/postgres"
-	"log"
 	"net/http"
 	"time"
 )
@@ -53,6 +53,7 @@ func (a *App) setupRoutes() {
 	auth := api.SubGroup("/auth")
 	auth.Post("/login", a.handlers.Auth.Login)
 	auth.Post("/register", a.handlers.Auth.Register)
+	auth.Post("/logout", a.handlers.Auth.Logout)
 
 	users := api.SubGroup("/users")
 	users.Use(Middleware{name: "AuthMiddleware", exec: authMiddleware})
