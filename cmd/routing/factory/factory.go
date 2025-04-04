@@ -1,4 +1,4 @@
-package route
+package factory
 
 import (
 	"morae/cmd/routing/healthcheck"
@@ -7,13 +7,13 @@ import (
 	"morae/internal/handler"
 )
 
-type Route struct {
+type RouteFactory struct {
 	Router   *router.Router
 	handlers *handler.Handlers
 }
 
-func NewRoute(h *handler.Handlers) *Route {
-	route := &Route{
+func NewRouteFactory(h *handler.Handlers) *RouteFactory {
+	route := &RouteFactory{
 		Router:   router.NewRouter(),
 		handlers: h,
 	}
@@ -23,14 +23,14 @@ func NewRoute(h *handler.Handlers) *Route {
 }
 
 // Registers middlewares
-func (a *Route) setupGlobalMiddlewares() {
+func (a *RouteFactory) setupGlobalMiddlewares() {
 	a.Router.Use(
     router.NewMiddleware("LogMiddleware", middleware.LoggingMiddleware),
     router.NewMiddleware("JsonMiddleware", middleware.JsonMiddleware),
 	)
 }
 
-func (a *Route) setupRoutes() {
+func (a *RouteFactory) setupRoutes() {
 	a.setupGlobalMiddlewares()
 	api := a.Router.Group("/v1/api")
 	api.Get("/healthcheck", healthcheck.HealthCheckHandler)

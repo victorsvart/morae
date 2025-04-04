@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"morae/cmd/config"
-	"morae/cmd/routing/route"
+	"morae/cmd/routing/factory"
 	"morae/internal/db"
 	"morae/internal/handler"
 	"morae/internal/store/postgres"
@@ -15,7 +15,7 @@ type App struct {
 	config   *config.Config
 	storage  *postgres.PostgresStorage
 	handlers *handler.Handlers
-	route   *route.Route
+	routeFactory   *factory.RouteFactory
 }
 
 // Initializes and returns a new App instance
@@ -28,7 +28,7 @@ func NewApp() *App {
 
 	app.storage = app.setupDatabase()
 	app.handlers = handler.NewHandlers(app.storage)
-  app.route = route.NewRoute(app.handlers)
+  app.routeFactory = factory.NewRouteFactory(app.handlers)
 	return app
 }
 
@@ -55,7 +55,7 @@ func mount() (*http.Server, *config.Config) {
 
 	svr := &http.Server{
 		Addr:         app.config.Port,
-		Handler:      app.route.Router,
+		Handler:      app.routeFactory.Router,
 		WriteTimeout: 30 * time.Second,
 		ReadTimeout:  10 * time.Second,
 		IdleTimeout:  time.Minute,
