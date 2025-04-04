@@ -39,18 +39,10 @@ Morae uses direnv for environment variable management.
 
 ### Using `.envrc` file
 
-Create a `.envrc` file in the project root with content similar to:
+Copy `.envrc.example` as `.envrc` in the project root with content similar to:
 
-```
-export PORT=:8080
-export HOST=localhost
-export DSN=postgres://youruser:yourpasword@localhost/databasename
-export DB_MAX_OPEN_CONNS=30
-export DB_MAX_IDLE_CONNS=30
-export DB_MAX_IDLE_TIME=900s
-export SECRET_KEY=yousecretkey
-export SECURE_TOKEN=false
-export AUTH_TOKEN_NAME=dev_token
+```bash
+cp .envrc.example .envrc
 ```
 
 Install direnv on your Linux distribution:
@@ -113,40 +105,40 @@ direnv allow
 
 1. Create a PostgreSQL database:
 
-   ```
-   $ createdb databasename
+   ```bash
+   createdb databasename
    ```
 
 2. Run migrations:
-   ```
-   $ make migrate-up
+   ```bash
+   make migrate-up
    ```
 
 ## Running the Application
 
 ### Development Mode with Hot Reloading
 
-```
-$ air
+```bash
+air
 ```
 
 ### Standard Development Mode
 
-```
-$ make run
+```bash
+make run
 ```
 
 ### Build and Run
 
-```
-$ make build
-$ ./morae
+```bash
+make build
+./morae
 ```
 
 ### Testing
 
-```
-$ make test
+```bash
+make test
 ```
 
 ## Makefile Commands
