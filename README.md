@@ -50,9 +50,59 @@ export DB_MAX_IDLE_CONNS=30
 export DB_MAX_IDLE_TIME=15min
 ```
 
-Then allow direnv to load the file:
+Install direnv on your Linux distribution:
 
+```bash
+# Ubuntu/Debian
+sudo apt update
+sudo apt install direnv
+
+# Fedora
+sudo dnf install direnv
+
+# Arch Linux
+sudo pacman -S direnv
+
+# CentOS/RHEL (using EPEL repository)
+sudo yum install epel-release
+sudo yum install direnv
+
+# openSUSE
+sudo zypper install direnv
+
+# Gentoo
+sudo emerge app-shells/direnv
+
+# Alpine Linux
+sudo apk add direnv
+
+# Using Homebrew (cross-platform)
+brew install direnv
 ```
+
+## Shell Configuration
+
+Add the appropriate hook to your shell configuration file:
+
+```bash
+# For bash (~/.bashrc)
+eval "$(direnv hook bash)"
+
+# For zsh (~/.zshrc)
+eval "$(direnv hook zsh)"
+
+# For fish (~/.config/fish/config.fish)
+direnv hook fish | source
+
+# For tcsh (~/.tcshrc)
+eval `direnv hook tcsh`
+```
+
+## Usage
+
+Allow your .envrc file using direnv in the root directory:
+
+```bash
 direnv allow
 ```
 
