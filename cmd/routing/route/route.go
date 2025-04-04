@@ -1,11 +1,10 @@
 package route
 
 import (
-	"encoding/json"
+	"morae/cmd/routing/healthcheck"
 	"morae/cmd/routing/middleware"
 	"morae/cmd/routing/router"
 	"morae/internal/handler"
-	"net/http"
 )
 
 type Route struct {
@@ -34,13 +33,7 @@ func (a *Route) setupGlobalMiddlewares() {
 func (a *Route) setupRoutes() {
   a.setupGlobalMiddlewares()
 	api := a.Router.Group("/v1/api")
-	api.Get("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{
-			"status":  "ok",
-			"message": "API is up and running",
-		})
-	})
+  api.Get("/healthcheck", healthcheck.HealthCheckHandler)
 
 	// dumb shit. needs a better way to deal with groups and subgroups in the router
 	auth := api.SubGroup("/auth")
