@@ -32,6 +32,7 @@ func (a *Route) setupGlobalMiddlewares() {
 }
 
 func (a *Route) setupRoutes() {
+  a.setupGlobalMiddlewares()
 	api := a.Router.Group("/v1/api")
 	api.Get("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
