@@ -5,7 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"time"
+
+	"github.com/Masterminds/squirrel"
 )
 
 type UserEntity struct {
@@ -31,9 +34,24 @@ type UserStore struct {
 }
 
 func (us *UserStore) GetById(ctx context.Context, id uint64) (*UserEntity, error) {
-	query := "SELECT id, full_name, email_address FROM mre_users where id = $1"
+	query, args, err := qb.
+		Select("id", "full_name", "email_address").
+		From("mre_users").
+		Where(squirrel.Eq{"id": id}).
+		ToSql()
+
+	if err != nil {
+		return nil, err
+	}
+
 	var user UserEntity
-	err := us.db.QueryRowContext(ctx, query, id).Scan(&user.ID, &user.FullName, &user.EmailAddress)
+	err = us.db.
+		QueryRowContext(ctx, query, args...).
+		Scan(
+			&user.ID,
+			&user.FullName,
+			&user.EmailAddress,
+		)
 	if err != nil {
 		return nil, err
 	}
@@ -52,10 +70,14 @@ func (us *UserStore) Create(ctx context.Context, ue *UserEntity) error {
 		return errors.New("Email already in usage")
 	}
 
-	query := `INSERT INTO mre_users (full_name, email_address, password) 
-            VALUES ($1, $2, $3) RETURNING id, full_name, email_address, created_at`
+	query, args, err := qb.
+		Insert("mre_users").
+		Columns("full_name", "email_address", "password").
+		Values(ue.FullName, ue.EmailAddress, ue.Password).
+		Suffix("RETURNING id, full_name, email_address, created_at").
+		ToSql()
 
-	err = us.db.QueryRowContext(ctx, query, ue.FullName, ue.EmailAddress, ue.Password).Scan(
+	err = us.db.QueryRowContext(ctx, query, args...).Scan(
 		&ue.ID,
 		&ue.FullName,
 		&ue.EmailAddress,
@@ -89,15 +111,16 @@ func (us *UserStore) Update(ctx context.Context, ue *UserEntity) error {
 	if ue.Password != "" {
 		password = &ue.Password
 	}
+	query, args, err := qb.
+		Update("mre_users").
+		Set("full_name", squirrel.Expr("COALESCE(?, full_name)", fullName)).
+		Set("email_address", squirrel.Expr("COALESCE(?, email_address)", emailAddress)).
+		Set("password", squirrel.Expr("COALESCE(?, password)", password)).
+		Where(squirrel.Eq{"id": ue.ID}).
+		Suffix("RETURNING id, full_name, email_address, created_at, updated_at").
+		ToSql()
 
-	query := `UPDATE mre_users SET 
-              full_name = COALESCE($1, full_name), 
-              email_address = COALESCE($2, email_address), 
-              password = COALESCE($3, password) 
-            WHERE id = $4
-            RETURNING id, full_name, email_address, created_at, updated_at`
-
-	err = us.db.QueryRowContext(ctx, query, fullName, emailAddress, password, ue.ID).Scan(
+	err = us.db.QueryRowContext(ctx, query, args...).Scan(
 		&ue.ID,
 		&ue.FullName,
 		&ue.EmailAddress,
@@ -117,8 +140,12 @@ func (us *UserStore) Delete(ctx context.Context, id uint64) error {
 		return errors.New("invalid id provided")
 	}
 
-	query := `DELETE FROM mre_users WHERE id = $1`
-	result, err := us.db.ExecContext(ctx, query, id)
+	query, args, err := qb.
+		Delete("mre_users").
+		Where(squirrel.Eq{"id": id}).
+		ToSql()
+
+	result, err := us.db.ExecContext(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf("failed to execute delete query: %w", err)
 	}
@@ -135,9 +162,14 @@ func (us *UserStore) List(ctx context.Context) ([]*UserEntity, error) {
 }
 
 func (us *UserStore) FindByEmail(ctx context.Context, emailAddress string) (*UserEntity, error) {
-	query := `SELECT id, full_name, email_address, password FROM mre_users WHERE email_address = $1`
+	query, args, err := qb.
+		Select("id", "full_name", "email_address", "password").
+		From("mre_users").
+		Where(squirrel.Eq{"email_address": emailAddress}).
+		ToSql()
+
 	var userEntity UserEntity
-	err := us.db.QueryRowContext(ctx, query, emailAddress).Scan(
+	err = us.db.QueryRowContext(ctx, query, args...).Scan(
 		&userEntity.ID,
 		&userEntity.FullName,
 		&userEntity.EmailAddress,
@@ -158,15 +190,20 @@ func (us *UserStore) emailExists(ctx context.Context, emailAddress string) (stri
 		return "", errors.New("Email cannot be empty")
 	}
 
-	query := `SELECT email_address FROM mre_users WHERE email_address = $1`
-	var email_address string
-	err := us.db.QueryRowContext(ctx, query, emailAddress).Scan(&email_address)
+	query, args, err := qb.
+		Select("email_address").
+		From("mre_users").
+		Where(squirrel.Eq{"email_address": emailAddress}).
+		ToSql()
 
+	var email_address string
+
+	err = us.db.QueryRowContext(ctx, query, args...).Scan(&email_address)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", nil
 		}
-
+		log.Println("HERE")
 		return "", err
 	}
 
