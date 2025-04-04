@@ -9,18 +9,18 @@ import (
 )
 
 type UpdateUserUsecase interface {
-	Execute(context.Context, *userdomain.User) (*userdto.UserResponse, error)
+	Execute(context.Context, *userdomain.User) (userdto.UserResponse, error)
 }
 
 type Update struct {
 	repo postgres.UserRepository
 }
 
-func (u *Update) Execute(ctx context.Context, userDomain *userdomain.User) (*userdto.UserResponse, error) {
+func (u *Update) Execute(ctx context.Context, userDomain *userdomain.User) (userdto.UserResponse, error) {
 	entity := usermapper.ToEntity(userDomain)
-	if err := u.repo.Update(ctx, entity); err != nil {
-		return nil, err
+	if err := u.repo.Update(ctx, &entity); err != nil {
+		return userdto.UserResponse{}, err
 	}
 
-	return usermapper.ToResponse(entity), nil
+	return usermapper.ToResponse(&entity), nil
 }

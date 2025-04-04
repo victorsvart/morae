@@ -17,8 +17,8 @@ func ToDomain(user *postgres.UserEntity) *userdomain.User {
 	}
 }
 
-func ToEntity(user *userdomain.User) *postgres.UserEntity {
-	return &postgres.UserEntity{
+func ToEntity(user *userdomain.User) postgres.UserEntity {
+	return postgres.UserEntity{
 		ID:           user.ID,
 		FullName:     user.FullName,
 		EmailAddress: user.EmailAddress.Value,
@@ -37,8 +37,8 @@ func FromDto(input *userdto.UserDto) (*userdomain.User, error) {
 	}, nil
 }
 
-func FromInput(input *userdto.UserInput) (*userdomain.User, error) {
-	user := &userdomain.User{
+func FromInput(input *userdto.UserInput) (userdomain.User, error) {
+	user := userdomain.User{
 		FullName:     input.FullName,
 		EmailAddress: userdomain.EmailAddress{},
 		Password:     userdomain.Password{},
@@ -48,8 +48,8 @@ func FromInput(input *userdto.UserInput) (*userdomain.User, error) {
 	return user, nil
 }
 
-func ToResponse(user *postgres.UserEntity) *userdto.UserResponse {
-	return &userdto.UserResponse{
+func ToResponse(user *postgres.UserEntity) userdto.UserResponse {
+	return userdto.UserResponse{
 		ID:           user.ID,
 		FullName:     user.FullName,
 		EmailAddress: user.EmailAddress,

@@ -9,25 +9,25 @@ import (
 )
 
 type CreateUserUsecase interface {
-	Execute(context.Context, *userdto.UserInput) (*userdto.UserResponse, error)
+	Execute(context.Context, *userdto.UserInput) (userdto.UserResponse, error)
 }
 
 type Create struct {
 	repo postgres.UserRepository
 }
 
-func (c *Create) Execute(ctx context.Context, input *userdto.UserInput) (*userdto.UserResponse, error) {
+func (c *Create) Execute(ctx context.Context, input *userdto.UserInput) (userdto.UserResponse, error) {
 	domain, err := usermapper.FromInput(input)
 	if err != nil {
-		return nil, err
+		return userdto.UserResponse{}, err
 	}
 
-	entity := usermapper.ToEntity(domain)
-	if err := c.repo.Create(ctx, entity); err != nil {
-		return nil, err
+	entity := usermapper.ToEntity(&domain)
+	if err := c.repo.Create(ctx, &entity); err != nil {
+		return userdto.UserResponse{}, err
 	}
 
-	return usermapper.ToResponse(entity), nil
+	return usermapper.ToResponse(&entity), nil
 }
 
 var (
