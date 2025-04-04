@@ -20,7 +20,7 @@ func NewConfig() *Config {
 	return &Config{
 		Port:         GetEnv("PORT", ":8080"),
 		Host:         GetEnv("HOST", "localhost"),
-		Dsn:          GetEnv("DSN", "postgres://victorsvart:123qwe@localhost/moraedb?sslmode=disable"),
+		Dsn:          GetEnv("DSN", "postgres://postgres:postgres@localhost/moraedb?sslmode=disable"),
 		MaxOpenConns: GetEnvInt("DB_MAX_OPEN_CONNS", 30),
 		MaxIdleConns: GetEnvInt("DB_MAX_IDLE_CONNS", 30),
 		MaxIdleTime:  GetEnv("DB_MAX_IDLE_TIME", "900s"),
