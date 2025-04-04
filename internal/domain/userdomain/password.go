@@ -6,10 +6,6 @@ type Password struct {
 	Value string
 }
 
-func SetPassword(value string) *Password {
-	return &Password{value}
-}
-
 func SetupPassword(plainPassword string) (*Password, error) {
 	if len(plainPassword) < 3 {
 		return nil, ErrInvalidPassword

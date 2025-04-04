@@ -9,8 +9,8 @@ func ToDomain(user *postgres.UserEntity) *userdomain.User {
 	return &userdomain.User{
 		ID:           user.ID,
 		FullName:     user.FullName,
-		EmailAddress: *userdomain.SetEmail(user.EmailAddress),
-		Password:     *userdomain.SetPassword(user.Password),
+		EmailAddress: userdomain.EmailAddress{Value: user.EmailAddress},
+		Password:     userdomain.Password{Value: user.Password},
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
 	}
@@ -31,8 +31,8 @@ func FromDto(input *userdomain.UserDto) (*userdomain.User, error) {
 	return &userdomain.User{
 		ID:           input.ID,
 		FullName:     input.FullName,
-		EmailAddress: *userdomain.SetEmail(input.EmailAddress),
-		Password:     *userdomain.SetPassword(input.Password),
+		EmailAddress: userdomain.EmailAddress{Value: input.EmailAddress},
+		Password:     userdomain.Password{Value: input.Password},
 	}, nil
 }
 
