@@ -9,29 +9,24 @@ import (
 )
 
 type GetUserByIdUsecase interface {
-	Execute(context.Context, uint64) (*userdto.UserResponse, error)
+	Execute(context.Context, uint64) (userdto.UserResponse, error)
 }
 
 type GetUserById struct {
 	repo postgres.UserRepository
 }
 
-func (u *GetUserById) Execute(ctx context.Context, id uint64) (*userdto.UserResponse, error) {
-	if id == 0 {
-		return nil, ErrInvalidId
+func (u *GetUserById) Execute(ctx context.Context, id uint64) (userdto.UserResponse, error) {
+	entity, err := u.repo.GetById(ctx, id)
+
+	if entity == nil {
+		return userdto.UserResponse{}, errors.New("User not found")
 	}
 
-	entity, err := u.repo.GetById(ctx, id)
-	if entity == nil {
-		return nil, errors.New("User not found")
-	}
 	if err != nil {
-		return nil, err
+		return userdto.UserResponse{}, err
 	}
 
 	return usermapper.ToResponse(entity), nil
 }
 
-var (
-	ErrInvalidId = errors.New("User id is invalid")
-)

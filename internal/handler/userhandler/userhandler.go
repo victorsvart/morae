@@ -26,14 +26,14 @@ func (u *UserHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := u.Usecases.GetById.Execute(r.Context(), id)
-	if response == nil {
-		utils.RespondWithError(w, http.StatusNotFound, err)
-		return
+	if id == 0 {
+    utils.RespondWithError(w, http.StatusBadRequest, ErrInvalidId)
 	}
 
+	response, err := u.Usecases.GetById.Execute(r.Context(), id)
 	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
+		utils.RespondWithError(w, http.StatusNotFound, err)
+		return
 	}
 
 	utils.RespondWithJSON(w, http.StatusOK, response)
