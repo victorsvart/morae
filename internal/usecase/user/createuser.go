@@ -21,6 +21,10 @@ func (c *Create) Execute(ctx context.Context, input *userdomain.UserInput) (*use
 		return nil, ErrInputIsNil
 	}
 
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
 	domain, err := usermapper.FromInput(input)
 	if err != nil {
 		return nil, err

@@ -22,6 +22,9 @@ func (u *GetUserById) Execute(ctx context.Context, id uint64) (*userdomain.UserR
 	}
 
 	entity, err := u.repo.GetById(ctx, id)
+	if entity == nil {
+		return nil, errors.New("User not found")
+	}
 	if err != nil {
 		return nil, err
 	}

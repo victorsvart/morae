@@ -5,6 +5,20 @@ import (
 	"strconv"
 )
 
+func GetBool(key string, fallback bool) bool {
+	val := os.Getenv(key)
+	if val == "" {
+		return fallback
+	}
+
+	parsed, err := strconv.ParseBool(val)
+	if err != nil {
+		return fallback
+	}
+
+	return parsed
+}
+
 func GetString(key, fallback string) string {
 	val := os.Getenv(key)
 	if val == "" {

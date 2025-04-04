@@ -1,0 +1,33 @@
+package auth
+
+import (
+	"context"
+	"golangproj/internal/domain/authdomain"
+	"golangproj/internal/mapper/usermapper"
+	"golangproj/internal/store/postgres"
+)
+
+type LoginUsecase interface {
+	Execute(context.Context, *authdomain.LoginInput) error
+}
+
+type Login struct {
+	repo postgres.UserRepository
+}
+
+func (l *Login) Execute(ctx context.Context, input *authdomain.LoginInput) error {
+	if input == nil {
+		return ErrInputIsNil
+	}
+	userEntity, err := l.repo.FindByEmail(ctx, input.EmailAddress)
+	if err != nil {
+		return err
+	}
+
+	userDomain := usermapper.ToDomain(userEntity)
+	if err := userDomain.Password.ComparePassword(input.Password); err != nil {
+		return err
+	}
+
+	return nil
+}
