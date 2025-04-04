@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"golangproj/internal/db"
-	"golangproj/internal/handler"
-	"golangproj/internal/store/postgres"
+	"morae/internal/db"
+	"morae/internal/handler"
+	"morae/internal/store/postgres"
 	"log"
 	"net/http"
 	"time"

@@ -1,8 +1,8 @@
 package usermapper
 
 import (
-	"golangproj/internal/domain/userdomain"
-	"golangproj/internal/store/postgres"
+	"morae/internal/domain/userdomain"
+	"morae/internal/store/postgres"
 )
 
 func ToDomain(user *postgres.UserEntity) *userdomain.User {

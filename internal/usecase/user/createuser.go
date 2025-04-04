@@ -3,9 +3,9 @@ package user
 import (
 	"context"
 	"errors"
-	"golangproj/internal/domain/userdomain"
-	"golangproj/internal/mapper/usermapper"
-	"golangproj/internal/store/postgres"
+	"morae/internal/domain/userdomain"
+	"morae/internal/mapper/usermapper"
+	"morae/internal/store/postgres"
 )
 
 type CreateUserUsecase interface {

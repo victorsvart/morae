@@ -2,12 +2,12 @@ package authhandler
 
 import (
 	"encoding/json"
-	"golangproj/internal/domain/authdomain"
-	"golangproj/internal/domain/userdomain"
-	"golangproj/internal/env"
-	"golangproj/internal/jwt"
-	"golangproj/internal/usecase/auth"
-	"golangproj/internal/utils"
+	"morae/internal/domain/authdomain"
+	"morae/internal/domain/userdomain"
+	"morae/internal/env"
+	"morae/internal/jwt"
+	"morae/internal/usecase/auth"
+	"morae/internal/utils"
 	"net/http"
 )
 

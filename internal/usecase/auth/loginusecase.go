@@ -2,9 +2,9 @@ package auth
 
 import (
 	"context"
-	"golangproj/internal/domain/authdomain"
-	"golangproj/internal/mapper/usermapper"
-	"golangproj/internal/store/postgres"
+	"morae/internal/domain/authdomain"
+	"morae/internal/mapper/usermapper"
+	"morae/internal/store/postgres"
 )
 
 type LoginUsecase interface {

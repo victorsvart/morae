@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"golangproj/internal/handler/authhandler"
-	"golangproj/internal/handler/userhandler"
-	"golangproj/internal/store/postgres"
-	"golangproj/internal/usecase/auth"
-	"golangproj/internal/usecase/user"
+	"morae/internal/handler/authhandler"
+	"morae/internal/handler/userhandler"
+	"morae/internal/store/postgres"
+	"morae/internal/usecase/auth"
+	"morae/internal/usecase/user"
 )
 
 type Handlers struct {

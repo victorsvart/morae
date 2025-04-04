@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 	"errors"
-	"golangproj/internal/store/postgres"
+	"morae/internal/store/postgres"
 )
 
 type DeleteUserUsecase interface {

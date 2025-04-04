@@ -3,8 +3,8 @@ package auth
 import (
 	"context"
 	"errors"
-	"golangproj/internal/domain/userdomain"
-	"golangproj/internal/usecase/user"
+	"morae/internal/domain/userdomain"
+	"morae/internal/usecase/user"
 )
 
 type RegisterUsecase interface {

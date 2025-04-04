@@ -2,9 +2,9 @@ package user
 
 import (
 	"context"
-	"golangproj/internal/domain/userdomain"
-	"golangproj/internal/mapper/usermapper"
-	"golangproj/internal/store/postgres"
+	"morae/internal/domain/userdomain"
+	"morae/internal/mapper/usermapper"
+	"morae/internal/store/postgres"
 )
 
 type UpdateUserUsecase interface {

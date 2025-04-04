@@ -1,7 +1,7 @@
 package user
 
 import (
-	"golangproj/internal/store/postgres"
+	"morae/internal/store/postgres"
 )
 
 type UserUsecases struct {

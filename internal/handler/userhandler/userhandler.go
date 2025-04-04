@@ -3,10 +3,10 @@ package userhandler
 import (
 	"encoding/json"
 	"errors"
-	"golangproj/internal/domain/userdomain"
-	"golangproj/internal/mapper/usermapper"
-	"golangproj/internal/usecase/user"
-	"golangproj/internal/utils"
+	"morae/internal/domain/userdomain"
+	"morae/internal/mapper/usermapper"
+	"morae/internal/usecase/user"
+	"morae/internal/utils"
 	"net/http"
 	"strconv"
 )

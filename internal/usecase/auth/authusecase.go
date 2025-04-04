@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"golangproj/internal/store/postgres"
-	"golangproj/internal/usecase/user"
+	"morae/internal/store/postgres"
+	"morae/internal/usecase/user"
 )
 
 type AuthUsecases struct {
