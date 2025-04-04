@@ -3,7 +3,7 @@ package userhandler
 import (
 	"encoding/json"
 	"errors"
-	"morae/internal/domain/userdomain"
+	"morae/internal/dto/userdto"
 	"morae/internal/mapper/usermapper"
 	"morae/internal/usecase/user"
 	"morae/internal/utils"
@@ -40,7 +40,7 @@ func (u *UserHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var input userdomain.UserInput
+	var input userdto.UserInput
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, err)
@@ -62,7 +62,7 @@ func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
-	var userDto userdomain.UserDto
+	var userDto userdto.UserDto
 
 	if err := json.NewDecoder(r.Body).Decode(&userDto); err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, err)

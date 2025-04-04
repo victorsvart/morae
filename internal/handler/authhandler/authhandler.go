@@ -3,7 +3,7 @@ package authhandler
 import (
 	"encoding/json"
 	"morae/internal/domain/authdomain"
-	"morae/internal/domain/userdomain"
+	"morae/internal/dto/userdto"
 	"morae/internal/env"
 	"morae/internal/jwt"
 	"morae/internal/usecase/auth"
@@ -49,7 +49,7 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
-	var input userdomain.UserInput
+	var input userdto.UserInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, err)
 		return

@@ -2,6 +2,7 @@ package usermapper
 
 import (
 	"morae/internal/domain/userdomain"
+	"morae/internal/dto/userdto"
 	"morae/internal/store/postgres"
 )
 
@@ -27,7 +28,7 @@ func ToEntity(user *userdomain.User) *postgres.UserEntity {
 	}
 }
 
-func FromDto(input *userdomain.UserDto) (*userdomain.User, error) {
+func FromDto(input *userdto.UserDto) (*userdomain.User, error) {
 	return &userdomain.User{
 		ID:           input.ID,
 		FullName:     input.FullName,
@@ -36,7 +37,7 @@ func FromDto(input *userdomain.UserDto) (*userdomain.User, error) {
 	}, nil
 }
 
-func FromInput(input *userdomain.UserInput) (*userdomain.User, error) {
+func FromInput(input *userdto.UserInput) (*userdomain.User, error) {
 	user := &userdomain.User{
 		FullName:     input.FullName,
 		EmailAddress: userdomain.EmailAddress{},
@@ -47,8 +48,8 @@ func FromInput(input *userdomain.UserInput) (*userdomain.User, error) {
 	return user, nil
 }
 
-func ToResponse(user *postgres.UserEntity) *userdomain.UserResponse {
-	return &userdomain.UserResponse{
+func ToResponse(user *postgres.UserEntity) *userdto.UserResponse {
+	return &userdto.UserResponse{
 		ID:           user.ID,
 		FullName:     user.FullName,
 		EmailAddress: user.EmailAddress,
