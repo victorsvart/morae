@@ -25,24 +25,27 @@ func NewRoute(h *handler.Handlers) *Route {
 // Registers middlewares
 func (a *Route) setupGlobalMiddlewares() {
 	a.Router.Use(
-		router.Middleware{Name: "LogMiddleware", Exec: middleware.LoggingMiddleware},
-		router.Middleware{Name: "JsonMiddleware", Exec: middleware.JsonMiddleware},
+    router.NewMiddleware("LogMiddleware", middleware.LoggingMiddleware),
+    router.NewMiddleware("JsonMiddleware", middleware.JsonMiddleware),
 	)
 }
 
 func (a *Route) setupRoutes() {
-  a.setupGlobalMiddlewares()
+	a.setupGlobalMiddlewares()
 	api := a.Router.Group("/v1/api")
-  api.Get("/healthcheck", healthcheck.HealthCheckHandler)
+	api.Get("/healthcheck", healthcheck.HealthCheckHandler)
 
-	// dumb shit. needs a better way to deal with groups and subgroups in the router
+	// dumb shit. needs a better way to deal with  subgroups in the router
 	auth := api.SubGroup("/auth")
 	auth.Post("/login", a.handlers.Auth.Login)
 	auth.Post("/register", a.handlers.Auth.Register)
 	auth.Post("/logout", a.handlers.Auth.Logout)
 
-	users := api.SubGroup("/users")
-	users.Use(router.Middleware{Name: "AuthMiddleware", Exec: middleware.AuthMiddleware})
+	users := api.SubGroup(
+		"/users",
+    router.NewMiddleware("AuthMiddleware", middleware.AuthMiddleware),
+	)
+
 	users.Get("/{id}", a.handlers.User.GetUserById)
 	users.Post("/", a.handlers.User.CreateUser)
 	users.Put("/", a.handlers.User.UpdateUser)

@@ -9,7 +9,7 @@ import (
 
 type RouteHandler struct {
 	router     *Router
-	middleware []Middleware
+	middleware []*Middleware
 	prefix     string
 }
 
@@ -27,15 +27,17 @@ func (rh *RouteHandler) Handle(method, pattern string, handler http.HandlerFunc)
 	rh.router.Handle(method, fullPattern, handler)
 }
 
-func (rh *RouteHandler) Use(mid ...Middleware) {
-	rh.middleware = append(rh.middleware, mid...)
-
-	scope := "global"
-	if rh.prefix != "" {
-		scope = fmt.Sprintf("route %q", rh.prefix)
-	}
-
+func (rh *RouteHandler) Use(mid ...*Middleware) {
 	for _, m := range mid {
+		if m == nil {
+			continue
+		}
+
+		rh.middleware = append(rh.middleware, m)
+		scope := "global"
+		if rh.prefix != "" {
+			scope = fmt.Sprintf("route %q", rh.prefix)
+		}
 		log.Printf("Applied middleware %q to %s", m.Name, scope)
 	}
 }
