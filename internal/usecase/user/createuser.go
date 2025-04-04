@@ -17,20 +17,10 @@ type Create struct {
 }
 
 func (c *Create) Execute(ctx context.Context, input *userdomain.UserInput) (*userdomain.UserResponse, error) {
-	if input == nil {
-		return nil, ErrInputIsNil
-	}
-
-	if err := input.Validate(); err != nil {
-		return nil, err
-	}
-
 	domain, err := usermapper.FromInput(input)
 	if err != nil {
 		return nil, err
 	}
-
-	domain.UserChecksAndSets(input.EmailAddress, input.Password)
 
 	entity := usermapper.ToEntity(domain)
 	if err := c.repo.Create(ctx, entity); err != nil {

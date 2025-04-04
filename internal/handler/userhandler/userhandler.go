@@ -75,11 +75,12 @@ func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if domain.Password.Value != "" && domain.Password.HashPassword() != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err)
-		return
+	if domain.Password.Value != "" {
+		if err := domain.Password.HashPassword(); err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, err)
+			return
+		}
 	}
-
 	response, err := u.Usecases.Update.Execute(r.Context(), domain)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err)
@@ -104,5 +105,5 @@ func (u *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "User deleted successfully"})
+	utils.RespondWithSuccess(w, http.StatusOK, "User deleted successfully")
 }

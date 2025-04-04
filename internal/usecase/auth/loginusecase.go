@@ -2,9 +2,12 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"morae/internal/domain/authdomain"
 	"morae/internal/mapper/usermapper"
 	"morae/internal/store/postgres"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type LoginUsecase interface {
@@ -26,8 +29,16 @@ func (l *Login) Execute(ctx context.Context, input *authdomain.LoginInput) error
 
 	userDomain := usermapper.ToDomain(userEntity)
 	if err := userDomain.Password.ComparePassword(input.Password); err != nil {
-		return err
+		if !errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return err
+		}
+
+		return ErrInvalidCredentials
 	}
 
 	return nil
 }
+
+var (
+	ErrInvalidCredentials = errors.New("Invalid crendetials")
+)
