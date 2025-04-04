@@ -3,20 +3,20 @@ package user
 import (
 	"context"
 	"errors"
-	"morae/internal/domain/userdomain"
+	"morae/internal/dto/userdto"
 	"morae/internal/mapper/usermapper"
 	"morae/internal/store/postgres"
 )
 
 type CreateUserUsecase interface {
-	Execute(context.Context, *userdomain.UserInput) (*userdomain.UserResponse, error)
+	Execute(context.Context, *userdto.UserInput) (*userdto.UserResponse, error)
 }
 
 type Create struct {
 	repo postgres.UserRepository
 }
 
-func (c *Create) Execute(ctx context.Context, input *userdomain.UserInput) (*userdomain.UserResponse, error) {
+func (c *Create) Execute(ctx context.Context, input *userdto.UserInput) (*userdto.UserResponse, error) {
 	domain, err := usermapper.FromInput(input)
 	if err != nil {
 		return nil, err

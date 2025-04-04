@@ -3,20 +3,20 @@ package user
 import (
 	"context"
 	"errors"
-	"morae/internal/domain/userdomain"
+	"morae/internal/dto/userdto"
 	"morae/internal/mapper/usermapper"
 	"morae/internal/store/postgres"
 )
 
 type GetUserByIdUsecase interface {
-	Execute(context.Context, uint64) (*userdomain.UserResponse, error)
+	Execute(context.Context, uint64) (*userdto.UserResponse, error)
 }
 
 type GetUserById struct {
 	repo postgres.UserRepository
 }
 
-func (u *GetUserById) Execute(ctx context.Context, id uint64) (*userdomain.UserResponse, error) {
+func (u *GetUserById) Execute(ctx context.Context, id uint64) (*userdto.UserResponse, error) {
 	if id == 0 {
 		return nil, ErrInvalidId
 	}

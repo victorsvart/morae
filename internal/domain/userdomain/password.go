@@ -1,6 +1,10 @@
 package userdomain
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"errors"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 type Password struct {
 	Value string
@@ -38,3 +42,7 @@ func (p *Password) ComparePassword(plainPassword string) error {
 
 	return nil
 }
+
+var (
+	ErrInvalidPassword = errors.New("Invalid password. Minimum is 3 characters")
+)

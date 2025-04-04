@@ -1,4 +1,4 @@
-package userdomain
+package userdto
 
 import (
 	"time"

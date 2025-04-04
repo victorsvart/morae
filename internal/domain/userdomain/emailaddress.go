@@ -1,6 +1,9 @@
 package userdomain
 
-import "net/mail"
+import (
+	"errors"
+	"net/mail"
+)
 
 type EmailAddress struct {
 	Value string
@@ -14,3 +17,7 @@ func NewEmailAddress(email string) (*EmailAddress, error) {
 
 	return &EmailAddress{Value: parse.Address}, nil
 }
+
+var (
+	ErrInvalidEmail = errors.New("Email is invalid")
+)
