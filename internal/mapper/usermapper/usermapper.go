@@ -37,11 +37,14 @@ func FromDto(input *userdomain.UserDto) (*userdomain.User, error) {
 }
 
 func FromInput(input *userdomain.UserInput) (*userdomain.User, error) {
-	return &userdomain.User{
+	user := &userdomain.User{
 		FullName:     input.FullName,
 		EmailAddress: userdomain.EmailAddress{},
 		Password:     userdomain.Password{},
-	}, nil
+	}
+	user.UserChecksAndSets(input.EmailAddress, input.Password)
+
+	return user, nil
 }
 
 func ToResponse(user *postgres.UserEntity) *userdomain.UserResponse {
