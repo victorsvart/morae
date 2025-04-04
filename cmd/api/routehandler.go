@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -27,6 +29,15 @@ func (rh *RouteHandler) Handle(method, pattern string, handler http.HandlerFunc)
 
 func (rh *RouteHandler) Use(mid ...Middleware) {
 	rh.middleware = append(rh.middleware, mid...)
+
+	scope := "global"
+	if rh.prefix != "" {
+		scope = fmt.Sprintf("route %q", rh.prefix)
+	}
+
+	for _, m := range mid {
+		log.Printf("Applied middleware %q to %s", m.name, scope)
+	}
 }
 
 func (r *RouteHandler) Get(pattern string, handler http.HandlerFunc) {

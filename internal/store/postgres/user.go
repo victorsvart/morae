@@ -23,6 +23,7 @@ type UserRepository interface {
 	Update(context.Context, *UserEntity) error
 	Delete(context.Context, uint64) error
 	List(context.Context) ([]*UserEntity, error)
+	FindByEmail(ctx context.Context, emailAddress string) (*UserEntity, error)
 }
 
 type UserStore struct {
@@ -131,6 +132,25 @@ func (us *UserStore) Delete(ctx context.Context, id uint64) error {
 
 func (us *UserStore) List(ctx context.Context) ([]*UserEntity, error) {
 	return nil, nil
+}
+
+func (us *UserStore) FindByEmail(ctx context.Context, emailAddress string) (*UserEntity, error) {
+	query := `SELECT id, full_name, email_address, password FROM mre_users WHERE email_address = $1`
+	var userEntity UserEntity
+	err := us.db.QueryRowContext(ctx, query, emailAddress).Scan(
+		&userEntity.ID,
+		&userEntity.FullName,
+		&userEntity.EmailAddress,
+		&userEntity.Password,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.New("user not found")
+		}
+		return nil, err
+	}
+
+	return &userEntity, nil
 }
 
 func (us *UserStore) emailExists(ctx context.Context, emailAddress string) (string, error) {

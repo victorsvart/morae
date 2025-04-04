@@ -20,7 +20,9 @@ func (u *UserHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, errors.New("Error getting id. Check if its not null or empty"))
+		utils.RespondWithError(w, http.StatusBadRequest,
+			errors.New("Error getting id. Check if its not null or empty"))
+
 		return
 	}
 

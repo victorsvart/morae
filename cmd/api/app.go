@@ -47,10 +47,15 @@ func (a *App) setupGlobalMiddlewares() {
 // Registers API routes
 func (a *App) setupRoutes() {
 	api := a.router.Group("/v1/api")
-	api.Get("/health", a.healthCheckHandler)
+	api.Get("/healthcheck", a.healthCheckHandler)
 
-	// dumb fuck shit. needs a better way to deal with groups and subgroups
+	// dumb shit. needs a better way to deal with groups and subgroups in the router
+	auth := api.SubGroup("/auth")
+	auth.Post("/login", a.handlers.Auth.Login)
+	auth.Post("/register", a.handlers.Auth.Register)
+
 	users := api.SubGroup("/users")
+	users.Use(Middleware{name: "AuthMiddleware", exec: authMiddleware})
 	users.Get("/{id}", a.handlers.User.GetUserById)
 	users.Post("/", a.handlers.User.CreateUser)
 	users.Put("/", a.handlers.User.UpdateUser)
