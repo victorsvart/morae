@@ -18,6 +18,8 @@ migrate-down:
 build:
 	@go build -o morae ./cmd/api
 
+
+
 .PHONY: run
 run:
 	@echo "Hot reload not enabled. To run the project with hot-reloading, run 'air' in root directory"
@@ -35,3 +37,11 @@ clean:
 .PHONY: debug
 debug:
 	@env | grep DSN
+
+.PHONY: docker-build
+docker-build:
+	@docker compose up -d --build
+
+.PHONY: docker
+docker:
+	@docker compose up -d
