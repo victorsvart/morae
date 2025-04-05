@@ -11,9 +11,12 @@ linters:
     - staticcheck
     - gosimple
     - unused
+    - revive
+
+formatters:
+  enable:
     - gofmt
     - goimports
-    - revive
 
 issues:
   max-same-issues: 3
