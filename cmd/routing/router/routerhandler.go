@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"slices"
 )
 
 type RouteHandler struct {
@@ -13,28 +14,32 @@ type RouteHandler struct {
 	prefix     string
 }
 
-func (rh *RouteHandler) Handle(method, pattern string, handler http.HandlerFunc, middlewareExclude ...*string) {
+func (rh *RouteHandler) Handle(method, pattern string, handler http.HandlerFunc, opts *RouteOptions) {
 	fullPattern := rh.prefix
 	if !strings.HasSuffix(rh.prefix, "/") && !strings.HasPrefix(pattern, "/") && pattern != "" {
 		fullPattern = "/"
 	}
 
 	fullPattern += pattern
-	for _, mw := range rh.middleware {
-		skip := false
-		for _, excluded := range middlewareExclude {
-			if *excluded == mw.Name {
-				skip = true
-				break
-			}
-		}
 
-		if skip {
-			continue
-		}
-		handler = mw.Exec(handler)
+  // if not excluded from middleware execute it otherwise skip
+  for _, mw := range rh.middleware {
+    if opts != nil && slices.Contains(opts.MiddlewareExclude, mw.Name) {
+      log.Printf("Route %s %s will excluded from %s", method, fullPattern, mw.Name)
+      continue
+    }
+
+    handler = mw.Exec(handler)
+  }
+
+	route := Route{
+		method:      method,
+		pattern:     fullPattern,
+		handlerFunc: handler,
 	}
-	rh.router.Handle(method, fullPattern, handler)
+
+
+	rh.router.Handle(&route)
 }
 
 func (rh *RouteHandler) Use(mid ...*Middleware) {
@@ -52,18 +57,18 @@ func (rh *RouteHandler) Use(mid ...*Middleware) {
 	}
 }
 
-func (r *RouteHandler) Get(pattern string, handler http.HandlerFunc, middlewareExclude ...*string) {
-	r.Handle(http.MethodGet, pattern, handler, middlewareExclude...)
+func (r *RouteHandler) Get(pattern string, handler http.HandlerFunc, opts *RouteOptions) {
+	r.Handle(http.MethodGet, pattern, handler, opts)
 }
 
-func (r *RouteHandler) Post(pattern string, handler http.HandlerFunc, middlewareExclude ...*string) {
-	r.Handle(http.MethodPost, pattern, handler)
+func (r *RouteHandler) Post(pattern string, handler http.HandlerFunc, opts *RouteOptions) {
+	r.Handle(http.MethodPost, pattern, handler, opts)
 }
 
-func (r *RouteHandler) Put(pattern string, handler http.HandlerFunc, middlewareExclude ...*string) {
-	r.Handle(http.MethodPut, pattern, handler)
+func (r *RouteHandler) Put(pattern string, handler http.HandlerFunc, opts *RouteOptions) {
+	r.Handle(http.MethodPut, pattern, handler, opts)
 }
 
-func (r *RouteHandler) Delete(pattern string, handler http.HandlerFunc, middlewareExclude ...*string) {
-	r.Handle(http.MethodDelete, pattern, handler)
+func (r *RouteHandler) Delete(pattern string, handler http.HandlerFunc, opts *RouteOptions) {
+	r.Handle(http.MethodDelete, pattern, handler, opts)
 }

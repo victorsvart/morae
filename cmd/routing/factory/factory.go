@@ -36,7 +36,7 @@ func (a *RouteFactory) setupGlobalMiddlewares() {
 func (a *RouteFactory) setupRoutes() {
 	a.setupGlobalMiddlewares()
 	api := a.Router.Group("/v1/api")
-	api.Get("/healthcheck", healthcheck.HealthCheckHandler)
+	api.Get("/healthcheck", healthcheck.HealthCheckHandler, nil)
 
 	routeGroups := []RouteGroup {
 		&authroute.AuthRoutes{Handlers: &a.handlers.Auth},

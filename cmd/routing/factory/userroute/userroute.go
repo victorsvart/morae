@@ -16,8 +16,8 @@ func (u *UserRoutes) Register(r *router.Group) {
     router.NewMiddleware("AuthMiddleware", middleware.AuthMiddleware),
 	)
 
-	users.Get("/{id}", u.Handlers.GetUserById)
-	users.Post("/", u.Handlers.CreateUser)
-	users.Put("/", u.Handlers.UpdateUser)
-	users.Delete("/{id}", u.Handlers.DeleteUser)
+	users.Get("/{id}", u.Handlers.GetUserById, nil)
+	users.Post("/", u.Handlers.CreateUser, nil)
+	users.Put("/", u.Handlers.UpdateUser, nil)
+	users.Delete("/{id}", u.Handlers.DeleteUser, nil)
 }
