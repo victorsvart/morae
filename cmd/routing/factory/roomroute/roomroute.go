@@ -11,13 +11,14 @@ type RoomRoutes struct {
 }
 
 func (rr *RoomRoutes) Register(r *router.Group) {
+  authMiddlewareName := "AuthMiddleware"
 	room := r.SubGroup(
 		"/rooms",
-		router.NewMiddleware("AuthMiddleware", middleware.AuthMiddleware),
+		router.NewMiddleware(authMiddlewareName, middleware.AuthMiddleware),
 	)
 
+	room.Get("/", rr.Handlers.GetAllRooms, &authMiddlewareName)
 	room.Get("/{id}", rr.Handlers.GetRoomUserId)
-	room.Get("/", rr.Handlers.GetAllRooms)
 	room.Post("/", rr.Handlers.CreateRoom)
 	room.Put("/", rr.Handlers.UpdateRoom)
 }
