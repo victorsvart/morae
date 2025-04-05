@@ -80,3 +80,18 @@ func (rh *RoomHandler) UpdateRoom(w http.ResponseWriter, r *http.Request) {
 
 	utils.RespondWithJSON(w, http.StatusOK, response)
 }
+
+func (rh *RoomHandler) DeleteRoom(w http.ResponseWriter, r *http.Request) {
+  id := r.PathValue("id")
+  if id == "" {
+    utils.RespondWithError(w, http.StatusBadRequest, errors.New("Id is empty"))
+    return
+  }
+
+  if err := rh.Usecases.DeleteRoom.Execute(r.Context(), id); err != nil {
+    utils.RespondWithError(w, http.StatusBadRequest, err)
+    return
+  }
+
+  utils.RespondWithSuccess(w, http.StatusOK, "Deleted succesfully")
+}
