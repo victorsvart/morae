@@ -8,6 +8,7 @@ Morae is a Golang REST API with minimum usage of external libraries.
 
 ![Go](https://img.shields.io/badge/Go-1.24+-00ADD8?style=for-the-badge&logo=go&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Latest-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Make](https://img.shields.io/badge/Make-Required-FF69B4?style=for-the-badge&logo=gnu&logoColor=white)
 ![direnv](https://img.shields.io/badge/direnv-Required-75D037?style=for-the-badge&logo=vim&logoColor=white)
 ![Air](https://img.shields.io/badge/Air-Hot_Reload-00BFFF?style=for-the-badge&logo=go&logoColor=white)
@@ -28,7 +29,7 @@ Morae is a Golang REST API with minimum usage of external libraries.
    go mod tidy
    ```
 
-3. Install Air for hot reloading (if not already installed). This is not necessary, check Make scripts bellow to run without hot reloading:
+3. Install Air for hot reloading (if not already installed). This is not necessary, check Make scripts below to run without hot reloading:
    ```
    go install github.com/cosmtrek/air@latest
    ```
@@ -43,6 +44,22 @@ Copy `.envrc.example` as `.envrc` in the project root with content similar to:
 
 ```bash
 cp .envrc.example .envrc
+```
+
+The following environment variables are required in your `.envrc` file:
+
+```bash
+export PORT=:8080
+export HOST=localhost
+export DSN=postgres://postgres:postgres@localhost:5432/moraedb?sslmode=disable
+export DB_MAX_OPEN_CONNS=30
+export DB_MAX_IDLE_CONNS=30
+export DB_MAX_IDLE_TIME=900s
+export SECRET_KEY=123qwe
+export SECURE_TOKEN=false
+export AUTH_TOKEN_NAME=auth_token
+export MONGO_DSN=mongodb://root:example@localhost:27017
+export MONGO_DB=moraedb
 ```
 
 Install direnv on your Linux distribution:
@@ -103,16 +120,30 @@ direnv allow
 
 ## Database Setup
 
+### PostgreSQL Setup
+
 1. Create a PostgreSQL database:
 
    ```bash
-   createdb databasename
+   createdb moraedb
    ```
 
 2. Run migrations:
    ```bash
    make migrate-up
    ```
+
+### MongoDB Setup
+
+1. Start a MongoDB instance using Docker (it's faster and easier):
+
+   ```bash
+   docker run -d --name mongodb -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=example mongo
+   ```
+
+   Or connect to an existing MongoDB instance by updating the `MONGO_DSN` in your `.envrc` file.
+
+2. The application will automatically create the required MongoDB database (`moraedb`) and collections on startup.
 
 ## Running the Application
 
