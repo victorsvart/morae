@@ -18,8 +18,6 @@ migrate-down:
 build:
 	@go build -o morae ./cmd/api
 
-
-
 .PHONY: run
 run:
 	@echo "Hot reload not enabled. To run the project with hot-reloading, run 'air' in root directory"
