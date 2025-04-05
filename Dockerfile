@@ -16,12 +16,13 @@ COPY go.mod ./
 
 COPY go.sum* ./
 
-RUN go mod download
-
 COPY . .
+RUN go mod download && \
+    go mod tidy
+
+# Build the application
 RUN go build -o main ./cmd/api
 
 EXPOSE 8080
 
-# Run migrations before starting the app
 CMD migrate -path=./cmd/migrate/migrations -database="$DSN" up && ./main
