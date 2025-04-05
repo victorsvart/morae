@@ -47,9 +47,9 @@ func (r *RoomStore) GetAllRooms(ctx context.Context, page int64, perPage int64) 
 	skip := page * perPage
 
 	opts := options.Find().
-		SetSkip(skip).
-		SetLimit(perPage).
-		SetSort(bson.D{{Key: "createdAt", Value: -1}})
+    SetSkip(skip).
+    SetLimit(perPage).
+    SetSort(bson.D{bson.E{Key: "createdAt", Value: -1}})
 
 	cursor, err := r.col.Find(ctx, bson.D{}, opts)
 	if err != nil {
