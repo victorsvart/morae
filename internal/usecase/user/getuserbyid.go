@@ -29,4 +29,3 @@ func (u *GetUserById) Execute(ctx context.Context, id uint64) (userdto.UserRespo
 
 	return usermapper.ToResponse(entity), nil
 }
-

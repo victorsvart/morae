@@ -13,6 +13,7 @@ type Config struct {
 	MaxOpenConns int
 	MaxIdleConns int
 	MaxIdleTime  string
+	MongoDsn     string
 }
 
 func NewConfig() *Config {
@@ -24,6 +25,7 @@ func NewConfig() *Config {
 		MaxOpenConns: GetEnvInt("DB_MAX_OPEN_CONNS", 30),
 		MaxIdleConns: GetEnvInt("DB_MAX_IDLE_CONNS", 30),
 		MaxIdleTime:  GetEnv("DB_MAX_IDLE_TIME", "900s"),
+		MongoDsn:     GetEnv("MONGO_DSN", "mongodb://root:example@localhost:27017"),
 	}
 }
 

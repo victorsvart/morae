@@ -6,6 +6,7 @@ import (
 	"morae/cmd/routing/factory"
 	"morae/internal/db"
 	"morae/internal/handler"
+	"morae/internal/store/mongodb"
 	"morae/internal/store/postgres"
 	"net/http"
 	"time"
@@ -14,6 +15,7 @@ import (
 type App struct {
 	config   *config.Config
 	storage  *postgres.PostgresStorage
+  mongostorage *mongodb.MongoStorage
 	handlers *handler.Handlers
 	routeFactory   *factory.RouteFactory
 }
@@ -27,7 +29,8 @@ func NewApp() *App {
 	}
 
 	app.storage = app.setupDatabase()
-	app.handlers = handler.NewHandlers(app.storage)
+  app.mongostorage = app.setupMongoDb()
+	app.handlers = handler.NewHandlers(app.storage, app.mongostorage)
   app.routeFactory = factory.NewRouteFactory(app.handlers)
 	return app
 }
@@ -45,8 +48,15 @@ func (a *App) setupDatabase() *postgres.PostgresStorage {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 
-	log.Println("Connected to database!")
+	log.Println("Connected to postgres database!")
 	return postgres.NewPostgresStorage(db)
+}
+
+func (a *App) setupMongoDb() *mongodb.MongoStorage {
+  db := db.ConnectMongo(a.config.MongoDsn)
+
+  log.Println("Connected to mongo database!")
+  return mongodb.NewMongoStorage(db)
 }
 
 // Initializes the server
