@@ -43,8 +43,8 @@ func FromInput(input *userdto.UserInput) (userdomain.User, error) {
 		EmailAddress: userdomain.EmailAddress{},
 		Password:     userdomain.Password{},
 	}
-	user.UserChecksAndSets(input.EmailAddress, input.Password)
 
+	user.UserChecksAndSets(input.EmailAddress, input.Password)
 	return user, nil
 }
 

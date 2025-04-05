@@ -17,7 +17,7 @@ func SetFullAddress(street, district string, number uint16) string {
 func ToDomain(document *mongodb.RoomDocument) roomdomain.Room {
 	return roomdomain.Room{
 		ID:          document.ID.Hex(), // converts ObjectID → string
-		OwnerId:      document.OwnerId,
+		OwnerId:     document.OwnerId,
 		Street:      document.Street,
 		Number:      document.Number,
 		District:    document.District,
@@ -26,22 +26,31 @@ func ToDomain(document *mongodb.RoomDocument) roomdomain.Room {
 	}
 }
 
-func ToDocument(room *roomdomain.Room) (mongodb.RoomDocument, error) {
-	var objID primitive.ObjectID
-	var err error
-
-	if room.ID != "" {
-		objID, err = primitive.ObjectIDFromHex(room.ID) // convert string → ObjectID
-		if err != nil {
-			return mongodb.RoomDocument{}, fmt.Errorf("invalid room ID: %w", err)
+func ToDomainSlice(document []*mongodb.RoomDocument) []*roomdomain.Room {
+	slice := make([]*roomdomain.Room, len(document))
+	for i, doc := range document {
+		slice[i] = &roomdomain.Room{
+			ID:       doc.ID.Hex(),
+			Street:   doc.Street,
+			Number:   doc.Number,
+			District: doc.District,
+			State:    doc.State,
 		}
-	} else {
-		objID = primitive.NewObjectID() // generate new ObjectID if empty
+	}
+
+	return slice
+}
+
+func ToDocument(room *roomdomain.Room) (mongodb.RoomDocument, error) {
+
+	objId, err := toNewObjectId(room.ID)
+	if err != nil {
+		return mongodb.RoomDocument{}, nil
 	}
 
 	return mongodb.RoomDocument{
-		ID:          objID,
-		OwnerId:      room.OwnerId,
+		ID:          objId,
+		OwnerId:     room.OwnerId,
 		Street:      room.Street,
 		Number:      room.Number,
 		District:    room.District,
@@ -52,11 +61,58 @@ func ToDocument(room *roomdomain.Room) (mongodb.RoomDocument, error) {
 
 func FromInput(input *roomdto.RoomInput) mongodb.RoomDocument {
 	return mongodb.RoomDocument{
-		OwnerId:      input.OwnerId,
+		OwnerId:     input.OwnerId,
 		Street:      input.Street,
 		Number:      input.Number,
 		District:    input.District,
 		FullAddress: SetFullAddress(input.Street, input.District, input.Number),
 		State:       input.State,
 	}
+}
+
+func FromDto(input *roomdto.RoomDto) (mongodb.RoomDocument, error) {
+	objId, err := toObjectId(input.ID)
+	if err != nil {
+		return mongodb.RoomDocument{}, nil
+	}
+
+	return mongodb.RoomDocument{
+		ID:          objId,
+		OwnerId:     input.OwnerId,
+		Street:      input.Street,
+		Number:      input.Number,
+		District:    input.District,
+		FullAddress: SetFullAddress(input.Street, input.District, input.Number),
+		State:       input.State,
+	}, nil
+}
+
+func toNewObjectId(plainId string) (primitive.ObjectID, error) {
+	var objID primitive.ObjectID
+	var err error
+
+	if plainId != "" {
+		objID, err = primitive.ObjectIDFromHex(plainId) // convert string → ObjectID
+		if err != nil {
+			return primitive.ObjectID{}, fmt.Errorf("invalid room ID: %w", err)
+		}
+	} else {
+		objID = primitive.NewObjectID() // generate new ObjectID if empty
+	}
+
+	return objID, nil
+}
+
+func toObjectId(plainId string) (primitive.ObjectID, error) {
+	var objID primitive.ObjectID
+	var err error
+
+	if plainId != "" {
+		objID, err = primitive.ObjectIDFromHex(plainId) // convert string → ObjectID
+		if err != nil {
+			return primitive.ObjectID{}, fmt.Errorf("invalid room ID: %w", err)
+		}
+	}
+
+	return objID, nil
 }
