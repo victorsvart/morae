@@ -1,3 +1,4 @@
+// Package roommapper provides functions to convert between domain, DTO, and database representations of rooms.
 package roommapper
 
 import (
@@ -10,14 +11,16 @@ import (
 	"morae/internal/store/mongodb"
 )
 
+// SetFullAddress formats a full address string using street, number, and district.
 func SetFullAddress(street, district string, number uint16) string {
 	return fmt.Sprintf("%s, %d - %s", street, number, district)
 }
 
+// ToDomain converts a RoomDocument to a Room domain entity.
 func ToDomain(document *mongodb.RoomDocument) roomdomain.Room {
 	return roomdomain.Room{
-		ID:          document.ID.Hex(), // converts ObjectID → string
-		OwnerId:     document.OwnerId,
+		ID:          document.ID.Hex(),
+		OwnerID:     document.OwnerID,
 		Street:      document.Street,
 		Number:      document.Number,
 		District:    document.District,
@@ -26,6 +29,7 @@ func ToDomain(document *mongodb.RoomDocument) roomdomain.Room {
 	}
 }
 
+// ToDomainSlice converts a slice of RoomDocuments to a slice of Room domain entities.
 func ToDomainSlice(document []*mongodb.RoomDocument) []*roomdomain.Room {
 	slice := make([]*roomdomain.Room, len(document))
 	for i, doc := range document {
@@ -37,20 +41,19 @@ func ToDomainSlice(document []*mongodb.RoomDocument) []*roomdomain.Room {
 			State:    doc.State,
 		}
 	}
-
 	return slice
 }
 
+// ToDocument converts a Room domain entity to a RoomDocument.
 func ToDocument(room *roomdomain.Room) (mongodb.RoomDocument, error) {
-
-	objId, err := toNewObjectId(room.ID)
+	objID, err := toNewObjectID(room.ID)
 	if err != nil {
-		return mongodb.RoomDocument{}, nil
+		return mongodb.RoomDocument{}, err
 	}
 
 	return mongodb.RoomDocument{
-		ID:          objId,
-		OwnerId:     room.OwnerId,
+		ID:          objID,
+		OwnerID:     room.OwnerID,
 		Street:      room.Street,
 		Number:      room.Number,
 		District:    room.District,
@@ -59,9 +62,10 @@ func ToDocument(room *roomdomain.Room) (mongodb.RoomDocument, error) {
 	}, nil
 }
 
+// FromInput converts a RoomInput DTO to a RoomDocument.
 func FromInput(input *roomdto.RoomInput) mongodb.RoomDocument {
 	return mongodb.RoomDocument{
-		OwnerId:     input.OwnerId,
+		OwnerID:     input.OwnerID,
 		Street:      input.Street,
 		Number:      input.Number,
 		District:    input.District,
@@ -70,15 +74,16 @@ func FromInput(input *roomdto.RoomInput) mongodb.RoomDocument {
 	}
 }
 
+// FromDto converts a RoomDto to a RoomDocument.
 func FromDto(input *roomdto.RoomDto) (mongodb.RoomDocument, error) {
-	objId, err := toObjectId(input.ID)
+	objID, err := toObjectID(input.ID)
 	if err != nil {
-		return mongodb.RoomDocument{}, nil
+		return mongodb.RoomDocument{}, err
 	}
 
 	return mongodb.RoomDocument{
-		ID:          objId,
-		OwnerId:     input.OwnerId,
+		ID:          objID,
+		OwnerID:     input.OwnerID,
 		Street:      input.Street,
 		Number:      input.Number,
 		District:    input.District,
@@ -87,32 +92,26 @@ func FromDto(input *roomdto.RoomDto) (mongodb.RoomDocument, error) {
 	}, nil
 }
 
-func toNewObjectId(plainId string) (primitive.ObjectID, error) {
-	var objID primitive.ObjectID
-	var err error
-
-	if plainId != "" {
-		objID, err = primitive.ObjectIDFromHex(plainId) // convert string → ObjectID
+// toNewObjectID returns an existing ObjectID from a string, or creates a new one if empty.
+func toNewObjectID(plainID string) (primitive.ObjectID, error) {
+	if plainID != "" {
+		objID, err := primitive.ObjectIDFromHex(plainID)
 		if err != nil {
 			return primitive.ObjectID{}, fmt.Errorf("invalid room ID: %w", err)
 		}
-	} else {
-		objID = primitive.NewObjectID() // generate new ObjectID if empty
+		return objID, nil
 	}
-
-	return objID, nil
+	return primitive.NewObjectID(), nil
 }
 
-func toObjectId(plainId string) (primitive.ObjectID, error) {
-	var objID primitive.ObjectID
-	var err error
-
-	if plainId != "" {
-		objID, err = primitive.ObjectIDFromHex(plainId) // convert string → ObjectID
+// toObjectID returns an ObjectID from a string if it's not empty.
+func toObjectID(plainID string) (primitive.ObjectID, error) {
+	if plainID != "" {
+		objID, err := primitive.ObjectIDFromHex(plainID)
 		if err != nil {
 			return primitive.ObjectID{}, fmt.Errorf("invalid room ID: %w", err)
 		}
+		return objID, nil
 	}
-
-	return objID, nil
+	return primitive.ObjectID{}, nil
 }

@@ -1,3 +1,4 @@
+// Package userdomain contains domain models and validation logic for users.
 package userdomain
 
 import (
@@ -5,19 +6,20 @@ import (
 	"net/mail"
 )
 
+// EmailAddress represents a validated email address.
 type EmailAddress struct {
 	Value string
 }
 
+// NewEmailAddress validates the given string and returns an EmailAddress instance if valid.
 func NewEmailAddress(email string) (*EmailAddress, error) {
-	parse, err := mail.ParseAddress(email)
+	parsed, err := mail.ParseAddress(email)
 	if err != nil {
 		return nil, ErrInvalidEmail
 	}
 
-	return &EmailAddress{Value: parse.Address}, nil
+	return &EmailAddress{Value: parsed.Address}, nil
 }
 
-var (
-	ErrInvalidEmail = errors.New("Email is invalid")
-)
+// ErrInvalidEmail is returned when the provided email is not a valid format.
+var ErrInvalidEmail = errors.New("email is invalid")

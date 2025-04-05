@@ -6,24 +6,26 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Password represents a user's password with related behavior.
 type Password struct {
 	Value string
 }
 
-func SetupPassword(plainPassword string) (*Password, error) {
-	if len(plainPassword) < 3 {
+// SetupPassword creates a new Password and hashes it if valid.
+func SetupPassword(plain string) (*Password, error) {
+	if len(plain) < 3 {
 		return nil, ErrInvalidPassword
 	}
 
-	password := &Password{Value: plainPassword}
-	err := password.HashPassword()
-	if err != nil {
+	p := &Password{Value: plain}
+	if err := p.HashPassword(); err != nil {
 		return nil, err
 	}
 
-	return password, nil
+	return p, nil
 }
 
+// HashPassword hashes the password's value using bcrypt.
 func (p *Password) HashPassword() error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(p.Value), bcrypt.DefaultCost)
 	if err != nil {
@@ -34,15 +36,12 @@ func (p *Password) HashPassword() error {
 	return nil
 }
 
-func (p *Password) ComparePassword(plainPassword string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(p.Value), []byte(plainPassword))
-	if err != nil {
-		return err
-	}
-
-	return nil
+// ComparePassword checks if the provided plain password matches the hashed value.
+func (p *Password) ComparePassword(plain string) error {
+	return bcrypt.CompareHashAndPassword([]byte(p.Value), []byte(plain))
 }
 
 var (
-	ErrInvalidPassword = errors.New("Invalid password. Minimum is 3 characters")
+	// ErrInvalidPassword is returned when a password doesn't meet length requirements.
+	ErrInvalidPassword = errors.New("invalid password: minimum length is 3 characters")
 )

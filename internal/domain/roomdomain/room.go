@@ -1,8 +1,10 @@
+// Package roomdomain contains domain-level representations and business logic for rooms.
 package roomdomain
 
+// Room represents the core domain model for a room document
 type Room struct {
 	ID          string
-	OwnerId     uint64
+	OwnerID     uint64
 	Street      string
 	Number      uint16
 	District    string

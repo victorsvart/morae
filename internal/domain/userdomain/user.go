@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// User represents a domain model for a system user.
 type User struct {
 	ID           uint64
 	FullName     string
@@ -13,14 +14,17 @@ type User struct {
 	UpdatedAt    time.Time
 }
 
-func (u *User) UserChecksAndSets(email, password string) error {
+// SetCredentials validates and sets the user's email and password.
+func (u *User) SetCredentials(email, password string) error {
 	emailAddress, err := NewEmailAddress(email)
 	if err != nil {
 		return err
 	}
 
 	pass := &Password{Value: password}
-	pass.HashPassword()
+	if err := pass.HashPassword(); err != nil {
+		return err
+	}
 
 	u.EmailAddress = *emailAddress
 	u.Password = *pass

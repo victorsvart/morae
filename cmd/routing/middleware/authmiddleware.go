@@ -1,3 +1,4 @@
+// Package middleware provides reusable HTTP middleware for handling logging, JSON responses, and authentication.
 package middleware
 
 import (
@@ -6,12 +7,13 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/golang-jwt/jwt/v5"
+	jwtlib "github.com/golang-jwt/jwt/v5"
 )
 
+// verifyJWT parses and verifies a JWT token using the HS256 algorithm and the secret key from environment variables.
 func verifyJWT(tokenString string) error {
-	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
-		if token.Method != jwt.SigningMethodHS256 {
+	_, err := jwtlib.Parse(tokenString, func(token *jwtlib.Token) (any, error) {
+		if token.Method != jwtlib.SigningMethodHS256 {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Method)
 		}
 
@@ -26,6 +28,8 @@ func verifyJWT(tokenString string) error {
 	return err
 }
 
+// AuthMiddleware is an HTTP middleware that verifies a user's JWT token from cookies.
+// It blocks the request with a 401 Unauthorized response if the token is missing or invalid.
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie(config.GetEnv("AUTH_TOKEN_NAME", "dev_token"))

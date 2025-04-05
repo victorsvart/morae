@@ -1,3 +1,5 @@
+// Package config provides application configuration management by loading values from environment variables,
+// with support for default fallbacks when variables are not set.
 package config
 
 import (
@@ -6,6 +8,7 @@ import (
 	"strconv"
 )
 
+// Config holds configuration values loaded from environment variables.
 type Config struct {
 	Port         string
 	Host         string
@@ -16,6 +19,7 @@ type Config struct {
 	MongoDsn     string
 }
 
+// NewConfig initializes a new Config instance using environment variables or default values.
 func NewConfig() *Config {
 	log.Println("Loading envs...")
 	return &Config{
@@ -29,16 +33,15 @@ func NewConfig() *Config {
 	}
 }
 
-// Returns the value of an environment variable or a default if not set. Returns string.
+// GetEnv returns the value of an environment variable, or a fallback value if the variable is not set.
 func GetEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
-
 	return fallback
 }
 
-// Returns the value of an environment variable or a default if not set. Returns int.
+// GetEnvInt returns the integer value of an environment variable, or a fallback value if the variable is not set or conversion fails.
 func GetEnvInt(key string, fallback int) int {
 	value, exists := os.LookupEnv(key)
 	if exists {
@@ -46,7 +49,6 @@ func GetEnvInt(key string, fallback int) int {
 		if err != nil {
 			return fallback
 		}
-
 		return conv
 	}
 	return fallback

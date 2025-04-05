@@ -1,12 +1,15 @@
+// Package authdomain defines domain models and validation logic for authentication-related operations.
 package authdomain
 
 import "errors"
 
+// LoginInput represents the user input required for authentication.
 type LoginInput struct {
 	EmailAddress string `json:"emailAddress"`
 	Password     string `json:"password"`
 }
 
+// Validate checks that the required fields in LoginInput are present.
 func (l *LoginInput) Validate() error {
 	if l.EmailAddress == "" {
 		return ErrEmailAddressRequired
@@ -20,6 +23,9 @@ func (l *LoginInput) Validate() error {
 }
 
 var (
-	ErrEmailAddressRequired = errors.New("Email is required")
-	ErrPasswordIsRequired   = errors.New("Password is required")
+	// ErrEmailAddressRequired is returned when the email field is empty.
+	ErrEmailAddressRequired = errors.New("email is required")
+
+	// ErrPasswordIsRequired is returned when the password field is empty.
+	ErrPasswordIsRequired = errors.New("password is required")
 )

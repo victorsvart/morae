@@ -1,3 +1,4 @@
+// Package middleware provides reusable HTTP middleware for logging, JSON headers, and authentication.
 package middleware
 
 import (
@@ -6,7 +7,7 @@ import (
 	"time"
 )
 
-// Logs HTTP Method, pattern and time of requests made
+// LoggingMiddleware logs the HTTP method, URL path, and duration of each request.
 func LoggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
@@ -16,8 +17,8 @@ func LoggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// Automatically sets response type as application/json
-func JsonMiddleware(next http.HandlerFunc) http.HandlerFunc {
+// JSONMiddleware sets the Content-Type of the response to application/json.
+func JSONMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		next(w, r)

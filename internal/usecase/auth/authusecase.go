@@ -1,3 +1,4 @@
+// Package auth provides use cases for authentication such as login and registration.
 package auth
 
 import (
@@ -5,14 +6,16 @@ import (
 	"morae/internal/usecase/user"
 )
 
-type AuthUsecases struct {
+// Usecases holds all authentication-related use cases.
+type Usecases struct {
 	Login    LoginUsecase
 	Register RegisterUsecase
 }
 
-func NewAuthUsecases(repo postgres.UserRepository) *AuthUsecases {
-	return &AuthUsecases{
+// NewAuthUsecases creates a new instance of AuthUsecases with required dependencies.
+func NewAuthUsecases(repo postgres.UserRepository) *Usecases {
+	return &Usecases{
 		Login:    &Login{repo},
-		Register: &Register{user.NewUserUsecases(repo).Create}, // reusing the CreateUsecase
+		Register: &Register{user.NewUserUsecases(repo).Create},
 	}
 }

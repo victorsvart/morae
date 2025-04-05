@@ -1,3 +1,5 @@
+// Package main is the entry point of the Morae application.
+// It starts the HTTP server and handles graceful shutdown.
 package main
 
 import (
@@ -23,9 +25,12 @@ func main() {
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-	<-sig
 
-	shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), 10*time.Second)
+	s := <-sig
+	log.Printf("Received signal: %s. Initiating shutdown...", s)
+
+	const shutdownTimeout = 10 * time.Second
+	shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer shutdownRelease()
 
 	if err := app.Shutdown(shutdownCtx); err != nil {
