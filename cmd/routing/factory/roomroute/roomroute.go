@@ -17,5 +17,6 @@ func (rr *RoomRoutes) Register(r *router.Group) {
 	)
 
 	room.Get("/{id}", rr.Handlers.GetRoomUserId)
+	room.Get("/", rr.Handlers.GetAllRooms)
 	room.Post("/", rr.Handlers.CreateRoom)
 }

@@ -13,6 +13,24 @@ type RoomHandler struct {
 	Usecases *room.RoomUsecases
 }
 
+
+func (rh *RoomHandler) GetAllRooms(w http.ResponseWriter, r *http.Request) {
+  var input roomdto.GetRoomPaged
+  err := json.NewDecoder(r.Body).Decode(&input)
+  if err != nil {
+    utils.RespondWithError(w, http.StatusUnprocessableEntity, err)
+    return
+  }
+
+  response, err := rh.Usecases.GetAllRooms.Execute(r.Context(), &input)
+  if err != nil {
+    utils.RespondWithError(w, http.StatusBadRequest, err)
+    return
+  }
+
+  utils.RespondWithJSON(w, http.StatusOK, response)
+}
+
 func (rh *RoomHandler) GetRoomUserId(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if id == "" {

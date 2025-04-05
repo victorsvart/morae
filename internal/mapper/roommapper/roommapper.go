@@ -26,6 +26,21 @@ func ToDomain(document *mongodb.RoomDocument) roomdomain.Room {
 	}
 }
 
+func ToDomainSlice(document []*mongodb.RoomDocument) []*roomdomain.Room {
+  slice := make([]*roomdomain.Room, len(document))
+  for i, doc := range(document) {
+    slice[i] =  &roomdomain.Room{
+      ID: doc.ID.Hex(),
+      Street: doc.Street,
+      Number: doc.Number,
+      District: doc.District,
+      State: doc.State,
+    }
+  }
+
+  return slice
+}
+
 func ToDocument(room *roomdomain.Room) (mongodb.RoomDocument, error) {
 	var objID primitive.ObjectID
 	var err error
