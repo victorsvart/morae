@@ -11,7 +11,6 @@ RUN apk add --no-cache bash curl && \
     curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.2/migrate.linux-amd64.tar.gz | tar xvz && \
     mv migrate /usr/local/bin/
 
-# Copy go.mod first
 COPY go.mod ./
 
 COPY go.sum* ./
@@ -20,7 +19,6 @@ COPY . .
 RUN go mod download && \
     go mod tidy
 
-# Build the application
 RUN go build -o main ./cmd/api
 
 EXPOSE 8080
