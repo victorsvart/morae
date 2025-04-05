@@ -10,8 +10,13 @@ import (
 
 // Represents a single API route with a pattern and asssociated handler function
 type Route struct {
+	method      string
 	pattern     string
 	handlerFunc http.HandlerFunc
+}
+
+type RouteOptions struct {
+	MiddlewareExclude []string
 }
 
 // Custom HTTP router. Manages router, middleware, and basic http error handling
@@ -49,7 +54,6 @@ func NewRouter() *Router {
 		notAllowed: NotAllowedHandler().ServeHTTP,
 	}
 	router.RouteHandler = RouteHandler{router: router, prefix: ""}
-
 	return router
 }
 
@@ -71,24 +75,19 @@ func NotAllowedHandler() http.Handler {
 }
 
 // Registers a new route  for a specific HTTP method and pattern
-func (r *Router) Handle(method, pattern string, handler http.HandlerFunc) {
+func (r *Router) Handle(route *Route) {
 	for _, mw := range r.middleware {
-		handler = mw.Exec(handler)
+		route.handlerFunc = mw.Exec(route.handlerFunc)
 	}
 
-	route := &Route{
-		pattern:     pattern,
-		handlerFunc: handler,
+	if r.routes[route.method] == nil {
+		r.routes[route.method] = []*Route{}
 	}
 
-	if r.routes[method] == nil {
-		r.routes[method] = []*Route{}
-	}
-
-	r.routes[method] = append(r.routes[method], route)
+	r.routes[route.method] = append(r.routes[route.method], route)
 
 	// method + pattern | Ex. GET /v1/api/users
-	fullPattern := fmt.Sprintf("%s %s", method, pattern)
+	fullPattern := fmt.Sprintf("%s %s", route.method, route.pattern)
 	log.Printf("Registered %s", fullPattern)
 	r.ServeMux.Handle(fullPattern, route.handlerFunc)
 }
