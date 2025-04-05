@@ -1,3 +1,4 @@
+// Package mongodb provides the MongoDB implementation for room data persistence and access logic.
 package mongodb
 
 import (
@@ -11,9 +12,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// RoomDocument represents a room entity in MongoDB.
 type RoomDocument struct {
-	ID          primitive.ObjectID `bson:"_id, omitempty"`
-	OwnerId     uint64             `bson:"_ownerId, omitempty"`
+	ID          primitive.ObjectID `bson:"_id,omitempty"`
+	OwnerID     uint64             `bson:"_ownerId,omitempty"`
 	FullAddress string             `bson:"fullAddress"`
 	Street      string             `bson:"street"`
 	Number      uint16             `bson:"number"`
@@ -21,37 +23,44 @@ type RoomDocument struct {
 	State       string             `bson:"state"`
 }
 
+// RoomRepository defines the behavior for room persistence layer.
 type RoomRepository interface {
-	GetRoomById(context.Context, string) (*RoomDocument, error)
+	GetRoomByID(context.Context, string) (*RoomDocument, error)
 	GetAllRooms(ctx context.Context, page int64, perPage int64) ([]*RoomDocument, error)
 	CreateRoom(context.Context, *RoomDocument) error
 	UpdateRoom(ctx context.Context, document *RoomDocument) error
 	DeleteRoom(ctx context.Context, id string) error
 }
 
+// RoomStore implements RoomRepository using a MongoDB collection.
 type RoomStore struct {
 	col *mongo.Collection
 }
 
+// ReturnErrorInCollection formats error messages for MongoDB operations.
 func ReturnErrorInCollection(operation string, err error) error {
-	return errors.New(fmt.Sprintf("%s error in collection Rooms: %v", operation, err))
+	return fmt.Errorf("%s error in collection Rooms: %w", operation, err)
 }
 
-func (r *RoomStore) GetAllRooms(ctx context.Context, page int64, perPage int64) ([]*RoomDocument, error) {
+// GetAllRooms returns a paginated list of all room documents sorted by creation time.
+func (r *RoomStore) GetAllRooms(ctx context.Context, page int64, perPage int64) (rooms []*RoomDocument, err error) {
 	skip := page * perPage
 
 	opts := options.Find().
-		SetSkip(skip).
-		SetLimit(perPage).
-		SetSort(bson.D{{Key: "createdAt", Value: -1}})
+    SetSkip(skip).
+    SetLimit(perPage).
+    SetSort(bson.D{bson.E{Key: "createdAt", Value: -1}})
 
 	cursor, err := r.col.Find(ctx, bson.D{}, opts)
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(ctx)
+	defer func() {
+		if cerr := cursor.Close(ctx); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 
-	var rooms []*RoomDocument
 	for cursor.Next(ctx) {
 		var room RoomDocument
 		if err := cursor.Decode(&room); err != nil {
@@ -67,17 +76,17 @@ func (r *RoomStore) GetAllRooms(ctx context.Context, page int64, perPage int64) 
 	return rooms, nil
 }
 
-func (r *RoomStore) GetRoomById(ctx context.Context, id string) (*RoomDocument, error) {
-	objectId, err := primitive.ObjectIDFromHex(id)
+// GetRoomByID fetches a room document by its ID.
+func (r *RoomStore) GetRoomByID(ctx context.Context, id string) (*RoomDocument, error) {
+	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, err
+		return nil, ErrInvalidRoomID
 	}
 
-	filter := bson.M{"_id": objectId}
+	filter := bson.M{"_id": objectID}
 
 	var doc RoomDocument
 	err = r.col.FindOne(ctx, filter).Decode(&doc)
-
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, nil
@@ -88,6 +97,7 @@ func (r *RoomStore) GetRoomById(ctx context.Context, id string) (*RoomDocument, 
 	return &doc, nil
 }
 
+// CreateRoom inserts a new room document into the collection.
 func (r *RoomStore) CreateRoom(ctx context.Context, document *RoomDocument) error {
 	if document.ID.IsZero() {
 		document.ID = primitive.NewObjectID()
@@ -105,30 +115,30 @@ func (r *RoomStore) CreateRoom(ctx context.Context, document *RoomDocument) erro
 	return nil
 }
 
+// UpdateRoom updates an existing room document.
 func (r *RoomStore) UpdateRoom(ctx context.Context, document *RoomDocument) error {
 	filter := bson.M{"_id": document.ID}
 	update := bson.M{"$set": document}
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
 
-	err := r.col.FindOneAndUpdate(ctx, filter, update, opts).Decode(&document)
-	if err != nil {
+	if err := r.col.FindOneAndUpdate(ctx, filter, update, opts).Decode(&document); err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// DeleteRoom removes a room document by its ID.
 func (r *RoomStore) DeleteRoom(ctx context.Context, id string) error {
-  objectId, err := primitive.ObjectIDFromHex(id)
-  if err != nil {
-    return err
-  }
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return ErrInvalidRoomID
+	}
 
-  filter := bson.M{"_id": objectId}
-  result := r.col.FindOneAndDelete(ctx, filter)
-  return result.Err()
+	filter := bson.M{"_id": objectID}
+	result := r.col.FindOneAndDelete(ctx, filter)
+	return result.Err()
 }
 
-var (
-	ErrInvalidRoomId = errors.New("Invalid room id")
-)
+// ErrInvalidRoomID is returned when a room ID is not a valid MongoDB ObjectID.
+var ErrInvalidRoomID = errors.New("invalid room id")

@@ -1,3 +1,4 @@
+// Package auth provides authentication-related use cases such as user login.
 package auth
 
 import (
@@ -10,18 +11,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// LoginUsecase defines the interface for user login logic.
 type LoginUsecase interface {
 	Execute(context.Context, *authdomain.LoginInput) error
 }
 
+// Login implements the LoginUsecase using the UserRepository.
 type Login struct {
 	repo postgres.UserRepository
 }
 
+// Execute handles user login by validating credentials against stored user data.
 func (l *Login) Execute(ctx context.Context, input *authdomain.LoginInput) error {
 	if input == nil {
 		return ErrInputIsNil
 	}
+
 	userEntity, err := l.repo.FindByEmail(ctx, input.EmailAddress)
 	if err != nil {
 		return err
@@ -32,7 +37,6 @@ func (l *Login) Execute(ctx context.Context, input *authdomain.LoginInput) error
 		if !errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			return err
 		}
-
 		return ErrInvalidCredentials
 	}
 
@@ -40,5 +44,6 @@ func (l *Login) Execute(ctx context.Context, input *authdomain.LoginInput) error
 }
 
 var (
-	ErrInvalidCredentials = errors.New("Invalid crendetials")
+	// ErrInvalidCredentials is returned when the provided login credentials are incorrect.
+	ErrInvalidCredentials = errors.New("invalid credentials")
 )

@@ -1,3 +1,5 @@
+// Package authhandler provides HTTP handlers for authentication operations
+// such as login, register, and logout.
 package authhandler
 
 import (
@@ -12,10 +14,12 @@ import (
 	"time"
 )
 
+// AuthHandler handles HTTP requests related to authentication.
 type AuthHandler struct {
-	Usecases *auth.AuthUsecases
+	Usecases *auth.Usecases
 }
 
+// Login authenticates a user and sets a JWT cookie.
 func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var input authdomain.LoginInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -39,7 +43,7 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Name:     env.GetString("AUTH_TOKEN_NAME", "dev_token"),
 		Value:    token,
 		HttpOnly: true,
-		Secure:   env.GetBool("SECURE_TOKEN", false), // should be true in prod
+		Secure:   env.GetBool("SECURE_TOKEN", false),
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
 		MaxAge:   3000,
@@ -48,10 +52,16 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithSuccess(w, http.StatusOK, "Logged in successfully")
 }
 
+// Register creates a new user account.
 func (a *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var input userdto.UserInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, err)
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	if err := input.Validate(); err != nil {
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -64,15 +74,16 @@ func (a *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithSuccess(w, http.StatusCreated, "Registered successfully")
 }
 
-func (a *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
+// Logout invalidates the authentication cookie.
+func (a *AuthHandler) Logout(w http.ResponseWriter, _ *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     env.GetString("AUTH_TOKEN_NAME", "dev_token"),
 		Value:    "",
 		Path:     "/",
-		MaxAge:   -1, // tells browser to delete the cookie
+		MaxAge:   -1,
 		Expires:  time.Unix(0, 0),
 		HttpOnly: true,
-		Secure:   env.GetBool("SECURE_TOKEN", false), // Must match
+		Secure:   env.GetBool("SECURE_TOKEN", false),
 		SameSite: http.SameSiteStrictMode,
 	})
 
