@@ -67,16 +67,16 @@ func SeedMongoDb(mongoDb *mongo.Database) {
 
   // []any needed otherwise insertmany bitches for some reason
 	rooms := []any{
-		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1001, FullAddress: "123 Main St, Springfield", Street: "Main St", Number: 123, District: "Downtown", State: "Illinois"},
-		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1002, FullAddress: "456 Elm St, Metropolis", Street: "Elm St", Number: 456, District: "Uptown", State: "New York"},
-		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1003, FullAddress: "789 Oak Ave, Gotham", Street: "Oak Ave", Number: 789, District: "Midtown", State: "New Jersey"},
-		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1004, FullAddress: "321 Pine Rd, Star City", Street: "Pine Rd", Number: 321, District: "Old Town", State: "California"},
-		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1005, FullAddress: "654 Cedar Blvd, Central City", Street: "Cedar Blvd", Number: 654, District: "East Side", State: "Nevada"},
-		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1006, FullAddress: "987 Birch Ln, Coast City", Street: "Birch Ln", Number: 987, District: "West End", State: "Oregon"},
-		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1007, FullAddress: "135 Maple Dr, Blüdhaven", Street: "Maple Dr", Number: 135, District: "Harbor", State: "Texas"},
-		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1008, FullAddress: "246 Ash St, Keystone City", Street: "Ash St", Number: 246, District: "Northside", State: "Florida"},
-		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1009, FullAddress: "579 Walnut Way, Smallville", Street: "Walnut Way", Number: 579, District: "South Park", State: "Kansas"},
-		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1010, FullAddress: "864 Poplar Ct, Riverdale", Street: "Poplar Ct", Number: 864, District: "Civic Center", State: "Georgia"},
+		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1, FullAddress: "123 Main St, Springfield", Street: "Main St", Number: 123, District: "Downtown", State: "Illinois"},
+		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1, FullAddress: "456 Elm St, Metropolis", Street: "Elm St", Number: 456, District: "Uptown", State: "New York"},
+		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1, FullAddress: "789 Oak Ave, Gotham", Street: "Oak Ave", Number: 789, District: "Midtown", State: "New Jersey"},
+		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1, FullAddress: "321 Pine Rd, Star City", Street: "Pine Rd", Number: 321, District: "Old Town", State: "California"},
+		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1, FullAddress: "654 Cedar Blvd, Central City", Street: "Cedar Blvd", Number: 654, District: "East Side", State: "Nevada"},
+		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1, FullAddress: "987 Birch Ln, Coast City", Street: "Birch Ln", Number: 987, District: "West End", State: "Oregon"},
+		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1, FullAddress: "135 Maple Dr, Blüdhaven", Street: "Maple Dr", Number: 135, District: "Harbor", State: "Texas"},
+		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1, FullAddress: "246 Ash St, Keystone City", Street: "Ash St", Number: 246, District: "Northside", State: "Florida"},
+		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1, FullAddress: "579 Walnut Way, Smallville", Street: "Walnut Way", Number: 579, District: "South Park", State: "Kansas"},
+		mongodb.RoomDocument{ID: primitive.NewObjectID(), OwnerId: 1, FullAddress: "864 Poplar Ct, Riverdale", Street: "Poplar Ct", Number: 864, District: "Civic Center", State: "Georgia"},
 	}
 
 	_, err = roomsCollection.InsertMany(ctx, rooms)
