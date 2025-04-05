@@ -26,6 +26,7 @@ type RoomRepository interface {
 	GetAllRooms(ctx context.Context, page int64, perPage int64) ([]*RoomDocument, error)
 	CreateRoom(context.Context, *RoomDocument) error
 	UpdateRoom(ctx context.Context, document *RoomDocument) error
+	DeleteRoom(ctx context.Context, id string) error
 }
 
 type RoomStore struct {
@@ -115,6 +116,17 @@ func (r *RoomStore) UpdateRoom(ctx context.Context, document *RoomDocument) erro
 	}
 
 	return nil
+}
+
+func (r *RoomStore) DeleteRoom(ctx context.Context, id string) error {
+  objectId, err := primitive.ObjectIDFromHex(id)
+  if err != nil {
+    return err
+  }
+
+  filter := bson.M{"_id": objectId}
+  result := r.col.FindOneAndDelete(ctx, filter)
+  return result.Err()
 }
 
 var (

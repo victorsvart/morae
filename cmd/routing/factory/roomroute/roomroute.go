@@ -23,4 +23,5 @@ func (rr *RoomRoutes) Register(r *router.Group) {
 	room.Get("/{id}", rr.Handlers.GetRoomUserId, nil)
 	room.Post("/", rr.Handlers.CreateRoom, nil)
 	room.Put("/", rr.Handlers.UpdateRoom, nil)
+  room.Delete("/{id}", rr.Handlers.DeleteRoom, nil)
 }
