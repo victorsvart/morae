@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"morae/cmd/config"
+	"morae/cmd/migrate/seed"
 	"morae/cmd/routing/factory"
 	"morae/internal/db"
 	"morae/internal/handler"
@@ -28,7 +29,7 @@ func NewApp() *App {
 		config: cfg,
 	}
 
-	app.storage = app.setupDatabase()
+	app.storage = app.setupPostgres()
   app.mongostorage = app.setupMongoDb()
 	app.handlers = handler.NewHandlers(app.storage, app.mongostorage)
   app.routeFactory = factory.NewRouteFactory(app.handlers)
@@ -36,7 +37,7 @@ func NewApp() *App {
 }
 
 // Initializes and connects to the database
-func (a *App) setupDatabase() *postgres.PostgresStorage {
+func (a *App) setupPostgres() *postgres.PostgresStorage {
 	db, err := db.New(
 		a.config.Dsn,
 		a.config.MaxIdleTime,
@@ -49,6 +50,7 @@ func (a *App) setupDatabase() *postgres.PostgresStorage {
 	}
 
 	log.Println("Connected to postgres database!")
+  seed.SeedPostgres(db)
 	return postgres.NewPostgresStorage(db)
 }
 
@@ -56,6 +58,7 @@ func (a *App) setupMongoDb() *mongodb.MongoStorage {
   db := db.ConnectMongo(a.config.MongoDsn)
 
   log.Println("Connected to mongo database!")
+  seed.SeedMongoDb(db)
   return mongodb.NewMongoStorage(db)
 }
 
