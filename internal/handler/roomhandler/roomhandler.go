@@ -89,7 +89,7 @@ func (rh *RoomHandler) DeleteRoom(w http.ResponseWriter, r *http.Request) {
   }
 
   if err := rh.Usecases.DeleteRoom.Execute(r.Context(), id); err != nil {
-    utils.RespondWithJSON(w, http.StatusBadRequest, err)
+    utils.RespondWithError(w, http.StatusBadRequest, err)
     return
   }
 
