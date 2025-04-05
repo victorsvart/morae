@@ -58,6 +58,7 @@ func (a *App) setupMongoDb() *mongodb.MongoStorage {
   db := db.ConnectMongo(a.config.MongoDsn)
 
   log.Println("Connected to mongo database!")
+  seed.SeedMongoDb(db)
   return mongodb.NewMongoStorage(db)
 }
 
