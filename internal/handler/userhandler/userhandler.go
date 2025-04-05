@@ -27,7 +27,7 @@ func (u *UserHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if id == 0 {
-    utils.RespondWithError(w, http.StatusBadRequest, ErrInvalidId)
+		utils.RespondWithError(w, http.StatusBadRequest, ErrInvalidId)
 	}
 
 	response, err := u.Usecases.GetById.Execute(r.Context(), id)

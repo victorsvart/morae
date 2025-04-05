@@ -2,6 +2,7 @@ package factory
 
 import (
 	"morae/cmd/routing/factory/authroute"
+	"morae/cmd/routing/factory/roomroute"
 	"morae/cmd/routing/factory/userroute"
 	"morae/cmd/routing/healthcheck"
 	"morae/cmd/routing/middleware"
@@ -40,6 +41,7 @@ func (a *RouteFactory) setupRoutes() {
 	routeGroups := []RouteGroup {
 		&authroute.AuthRoutes{Handlers: &a.handlers.Auth},
     &userroute.UserRoutes{Handlers: &a.handlers.User},
+    &roomroute.RoomRoutes{Handlers: &a.handlers.Room},
 	}
 
 	for _, rg := range routeGroups {

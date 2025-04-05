@@ -34,5 +34,18 @@ services:
       SECURE_TOKEN: "false"
       AUTH_TOKEN_NAME: "auth_token"
 
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-data:/data/db
+
 volumes:
+  mongo-data:
   pgdata:
