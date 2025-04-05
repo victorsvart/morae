@@ -1,4 +1,4 @@
-version: 2
+version: "2"
 
 run:
   timeout: 5m
@@ -16,7 +16,5 @@ linters:
     - revive
 
 issues:
-  exclude-use-default: false
   max-same-issues: 3
   max-issues-per-linter: 0
-  max-issues: 0
