@@ -16,10 +16,30 @@ services:
       retries: 1
       timeout: 3s
 
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
   api:
     build: .
     depends_on:
       db:
+        condition: service_healthy
+      mongo:
         condition: service_healthy
     ports:
       - "8080:8080"
@@ -33,18 +53,8 @@ services:
       SECRET_KEY: "123qwe"
       SECURE_TOKEN: "false"
       AUTH_TOKEN_NAME: "auth_token"
-
-  mongo:
-    image: mongo:6
-    container_name: mongo
-    restart: always
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-    volumes:
-      - mongo-data:/data/db
+      MONGO_DSN: "mongodb://root:example@mongo:27017"
+      MONGO_DB: "moraedb"
 
 volumes:
   mongo-data:
