@@ -32,6 +32,10 @@ jobs:
           version: latest
           args: ./...
 
+      - name: Format all Go files with gofmt
+        run: |
+          gofmt -w .
+
       - name: Check gofmt formatting
         run: |
           UNFORMATTED=$(gofmt -l .)
