@@ -111,6 +111,7 @@ func (us *UserStore) Update(ctx context.Context, ue *UserEntity) error {
 	if ue.Password != "" {
 		password = &ue.Password
 	}
+
 	query, args, err := qb.
 		Update("mre_users").
 		Set("full_name", squirrel.Expr("COALESCE(?, full_name)", fullName)).

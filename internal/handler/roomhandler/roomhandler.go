@@ -63,3 +63,20 @@ func (rh *RoomHandler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 
 	utils.RespondWithJSON(w, http.StatusOK, response)
 }
+
+func (rh *RoomHandler) UpdateRoom(w http.ResponseWriter, r *http.Request) {
+	var input roomdto.RoomDto
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	response, err := rh.Usecases.UpdateRoom.Execute(r.Context(), &input)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, response)
+}

@@ -6,6 +6,7 @@ type RoomUsecases struct {
 	GetAllRooms GetAllRoomsUsecase
 	GetById     GetRoomByIdUsecase
 	CreateRoom  CreateRoomInterface
+  UpdateRoom UpdateRoomUsecase
 }
 
 func NewRoomUsecases(repo mongodb.RoomRepository) *RoomUsecases {
@@ -13,5 +14,6 @@ func NewRoomUsecases(repo mongodb.RoomRepository) *RoomUsecases {
     GetAllRooms: &GetAllRooms{repo},
 		GetById:    &GetRoomById{repo},
 		CreateRoom: &CreateRoom{repo},
+    UpdateRoom: &UpdateRoom{repo},
 	}
 }

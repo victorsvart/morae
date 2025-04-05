@@ -25,6 +25,7 @@ type RoomRepository interface {
 	GetRoomById(context.Context, string) (*RoomDocument, error)
 	GetAllRooms(ctx context.Context, page int64, perPage int64) ([]*RoomDocument, error)
 	CreateRoom(context.Context, *RoomDocument) error
+	UpdateRoom(ctx context.Context, document *RoomDocument) error
 }
 
 type RoomStore struct {
@@ -102,3 +103,20 @@ func (r *RoomStore) CreateRoom(ctx context.Context, document *RoomDocument) erro
 
 	return nil
 }
+
+func (r *RoomStore) UpdateRoom(ctx context.Context, document *RoomDocument) error {
+	filter := bson.M{"_id": document.ID}
+	update := bson.M{"$set": document}
+	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
+
+	err := r.col.FindOneAndUpdate(ctx, filter, update, opts).Decode(&document)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var (
+	ErrInvalidRoomId = errors.New("Invalid room id")
+)
